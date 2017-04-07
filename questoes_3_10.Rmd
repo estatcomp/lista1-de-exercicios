@@ -56,8 +56,8 @@ U_3 & \textrm{se } |U_3|\leq max\{|U_1|,|U_2|\}\\
 $$
 e como $U_2$ e $U_3$ são simétricas em torno de zero, pelo algoritmo temos que $X$ também o será. Logo, $P(X<0) = 1/2$. Considerando então $0<x<1$, temos que
 \begin{align*}
-P(|X|\leq x) &= P(|U_3|>max\{|U_1|,|U_2|\},|U_2|\leq x) + P(|U_3|>max\{|U_1|,|U_2|\},|U_3|\leq x)\\
-&= P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) + P(Y_3>max\{Y_1,Y_2\},Y_3\leq x).
+P(|X|\leq x) &= P(|U_3|>max\{|U_1|,|U_2|\},|U_2|\leq x) + P(|U_3| \leq max\{|U_1|,|U_2|\},|U_3|\leq x)\\
+&= P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) + P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x).
 \end{align*}
 
 Sabemos que a densidade de $Y_i$ é $f_{Y_i}(y) = 1$ para $0<y<1$. Assim, calculando a primeira probabilidade temos que
@@ -73,13 +73,13 @@ P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) &= P(Y_1\leq Y_2 \leq Y_3, Y_2\leq x) + P(Y_2\le
 
 Na segunda probabilidade, temos que
 \begin{align*}
-P(Y_3>max\{Y_1,Y_2\},Y_3\leq x) &= P(Y_3\leq Y_2 \leq Y_1, Y_3\leq x) + P(Y_2\leq Y_3 \leq Y_1, Y_3\leq x) \\
+P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= P(Y_3\leq Y_2 \leq Y_1, Y_3\leq x) + P(Y_2\leq Y_3 \leq Y_1, Y_3\leq x) \\
 &+ P(Y_3\leq Y_1 \leq Y_2, Y_3\leq x) + P(Y_1\leq Y_3 \leq Y_2, Y_3\leq x)\\
 &= 2[P(Y_3\leq Y_2 \leq Y_1, Y_3\leq x) + P(Y_2\leq Y_3 \leq Y_1, Y_3\leq x)],
 \end{align*}
 onde na primeira igualdade listamos as possíveis formas que o evento $[Y_3>max\{Y_1,Y_2\},Y_3\leq x]$ pode ocorrer e na segunda igualdade usamos o fato de $Y_1$ e $Y_2$ serem identicamente distribuídas. Daí
 \begin{align*}
-P(Y_3>max\{Y_1,Y_2\},Y_3\leq x) &= 2\left[ \int_{0}^{x}\int_{y_3}^{1}\int_{y_2}^{1}dy_1dy_2dy_3 + \int_{0}^{x}\int_{0}^{y_3}\int_{y_3}^{1}dy_1dy_2dy_3 \right]\\
+P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= 2\left[ \int_{0}^{x}\int_{y_3}^{1}\int_{y_2}^{1}dy_1dy_2dy_3 + \int_{0}^{x}\int_{0}^{y_3}\int_{y_3}^{1}dy_1dy_2dy_3 \right]\\
 &= 2\left[ \int_{0}^{x}\int_{y_3}^{1}(1-y_2)dy_2dy_3 + \int_{0}^{x}\int_{0}^{y_3}(1-y_3)dy_2dy_3 \right]\\
 &= 2\left[ \int_{0}^{x}\left[\left.(y_2-\frac{y_2^2}{2})\right|_{y_3}^{1}\right]dy_3 + \int_{0}^{x}(1-y_3)y_3dy_3 \right]\\
 &= 2\left[ \int_{0}^{x}\left[\frac{1}{2} - y_3 + \frac{y_3^2}{2}\right]dy_3 + \left.\left(\frac{y_3^2}{2}-\frac{y_3^3}{3}\right)\right|_0^x \right]\\
