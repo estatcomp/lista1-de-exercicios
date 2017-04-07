@@ -33,7 +33,11 @@ curve(d_epach, xlim=c(-1,1),add=TRUE,col=2,lwd=2)
 
 Comparando o histograma com a densidade Epanechnikov, vemos que os valores simulados estão bastante próximos da densidade teórica.
 
-Nessa parte vamos provar que o algoritmo de fato gera valores da densida Epanechnikov. Sabemos que $U_i \sim U(-1,1)$, $i\in\{1,2,3\}$, daí a função de distribuição de $U_i$ é 
+Nessa parte vamos provar que o algoritmo de fato gera valores da densidade Epanechnikov, primeiro utilizamos integrais para encontrar a função de distribuição desejada e verificamos que o algoritmo é adequado. Depois resolvemos de outro método, utilizando estatística de ordem para facilitar a resolução . 
+
+1º Método
+
+Sabemos que $U_i \sim U(-1,1)$, $i\in\{1,2,3\}$, daí a função de distribuição de $U_i$ é 
 $$
 F_U(u) = \frac{u+1}{2},
 $$
@@ -103,7 +107,53 @@ f_X(x) = \frac{3(1-x^2)}{4}, \quad -1\leq x \leq 1,
 $$
 assim, vemos que $X$ tem distribuição Epanechnikov, e o método de geração está correto.
 
+2º Método
 
+Note que o algoritmo proposto pode ser encarado como uma mistura de distribuições das estatísticas de ordem 1 e 2 para três uniformes com parametrização $(0,1)$.
+
+Portanto, é razoável afirmar que a distribuição desejada pode ser obtida da seguinte forma:
+
+\begin{equation}\label{eq:estordem}
+f^{\ast}(u)=\frac{1}{2}f_{(1)}(u)+\frac{1}{2}f_{(2)}(u).
+\end{equation}
+Note que está é uma afirmação, que será provada verdadeira caso a distribuição obtida seja, de fato, a que buscamos
+
+Sabemos que a distribuição genérica de uma estatística de ordem qualquer é dada da seguinte maneira
+
+$$
+f_{(k)}(x) = \frac{n!}{(k-1)!(n-k)!} \left[F_{X}(x)\right]^{k-1} \left[1-F_{X}(x)\right]^{n-k}f_{X}(x)
+$$
+Adaptando para o nosso caso temos que:
+
+$$
+f_{(1)}(u)=3(1-u)^{2}
+$$
+e
+
+$$
+f_{(2)}(u)=3u(1-u),
+$$
+isso porque para uma distribuição uniforme (0,1),
+
+$$
+F_{X}=\frac{x-a}{b-a}=x
+$$
+e
+$$
+f_{X}=\frac{1}{b-a}=1
+$$
+
+Substituindo $f_{(1)}$ e $f_{(2)}$ na equação \eqref{eq:estordem} temos que:
+
+\begin{equation}\label{eq:densepac}
+f^{\ast}(u)=\frac{3}{2}(1-u)^{2} + \frac{3}{2}u(1-u) = \frac{3}{2}\left(1-u^2\right), u<1
+\end{equation}
+
+Observe que $u$ na equação acima está definida apenas para $u<1$, mas pela simetria da distribuição podemos dividir a equação \eqref{eq:densepac} por 2 para obter a função de distribuição no domínio desejado, que é $|u|<1$.
+
+$$
+f^{\ast}(u)=\frac{\frac{3}{2}(1-u)^{2} + \frac{3}{2}u(1-u)}{2} = \frac{3}{4}\left(1-u^2\right), |u|< 1
+$$
 Questão 10:
 
 A questão pede que estimemos a esperança de $X^2$ de uma distribuição normal padrão definida no intervalo $[1,\infty)$ pelo método da amostragem por importância.
