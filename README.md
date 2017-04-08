@@ -10,7 +10,7 @@
 Divisão das questões:
 
 * *Questão 1*: Fernando & Rafael ( _ )
-* *Questão 2*: Telma & Fabiana ( _ )
+* *Questão 2*: Telma & Fabiana ( X )
 * *Questão 3*: Rodney & Mario ( X )
 * *Questão 4*: Pedro & Ricardo ( _ )
 * *Questão 5*: André & Daniel ( _ )
