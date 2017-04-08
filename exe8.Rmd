@@ -29,20 +29,20 @@ a implementação do algoritmo usando estimação por Monte Carlo é apresentado
 ```{r}
 #usando uniformes (0,1)
 
-m <-100;
-n <-20
-x <-1.5
-alpha=0.05
+m <-1000;
+n <-200;
+x <-1.5;
+alpha=0.05;
 cdf <- replicate(m, {
   u <-runif(n)
   g<-(x*exp((-(u*x)^2)/2))/sqrt(2*pi)
   mean(g)+0.5})
 media1 <- mean(cdf);
 v1<- var(cdf);
-ic<-round(media1 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) * sqrt(v1/m), 4)
+ic1<-round(media1 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) * sqrt(v1/m), 4)
 print(media1)
 print(v1)
-print(ic)
+print(ic1)
 
 
 ```
@@ -51,20 +51,20 @@ print(ic)
 ```{r}
 #Usando uniformes (0,x)
 
-x <- 1.5
-n <-1000
-m <-100;
-alpha=0.05
+x <- 1.5;
+n <-1000;
+m <-200;
+alpha=0.05;
 cdf <- replicate(m, {
   u <-runif(n, 0, x)
   g<-(exp((-(u)^2)/2))/sqrt(2*pi)
-  x*(mean(g))+0.5})
+  x*mean(g)+0.5})
 media2 <- mean(cdf);
 v2<- var(cdf);
-ic<-round(media2 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) *sqrt(v2/m), 4)
-print(media1)
-print(v1)
-print(ic)
+ic2<-round(media2 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) *sqrt(v2/m), 4)
+print(media2)
+print(v2)
+print(ic2)
 ```
 
 
