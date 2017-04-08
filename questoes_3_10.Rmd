@@ -1,28 +1,4 @@
 ---
-title: "Questão 2"
-author: "Fabiana/Telma"
-date: "April 8, 2017"
-output: pdf_document
----
-
-Questão 2:
-
-Geramos amostras de uma distribuição de interesse a partir da geração de de uma distribuição conhecida e então, rejeitando um subconjunto gerado. O mecanismo de rejeição é construído de forma que, a amostra que será aceita segue a distribuição de interesse.
-Queremos gerar valores aleatórios de uma densidade de probabilidade f definida em um algum conjunto X.
- Seja g uma densidade em X a partir da qual sabemos gerar valores aleatórios e com a propriedade de que
-F(x) <= c*g(x), para todo x E X e alguma constante c.
-
-Geramos um elemento X a partir da densidade g e aceitamos o elemento com probabilidade f(x)/cg(X). 
-Este método pode ser implementado ao gerar um elemento U distribuido uniformemente em (0,1) e então, aceitamos   se U<= f(x)/cg(X).. 
-Se X é rejeitado, um novo candidato é amostrado de g e repetimos o teste de aceitação. 
-O processo se repete até que o teste de aceitação seja positivo; o valor aceito é um elemento selecionado de f.
-Algoritmo
-O algoritmo do método de aceitação-rejeição pode ser apresentado nos passos abaixo.
-1.    Simula-se o valor X com densidade g 
-2.    Gera-se um número aleatório U ~U(0,1)
-3.    Se U<= f(x)/cg(X), aceita-se o valor   e pare. Caso contrário, retorna-se ao passo 1.
-
----
 title: "Questão 3"
 author: "Mário/Rodney"
 date: "April 6, 2017"
@@ -217,6 +193,6 @@ return(result)
 cbind(rbind(MCNormTruncX2(n=100),MCNormTruncX2(n=1e4),MCNormTruncX2(n=1e6)),c(100,1e4,1e6))
 ```
 
-Note que os valores de truncagem estão pré definidos, mas nada impede que os valores de $lower$ e $upper$ sejam substituidos. O mesmo ocorre com os valores da média e do desvio-padrão. Note também que os resultados indicam que o estimador é consistente, pois à medida que se eleva $n$, a variância do estimador reduz considerávelmente.
+Note que os valores de truncagem estão pré definidos, mas nada impede que os valores de $lower$ e $upper$ sejam substituidos. O mesmo ocorre com os valores da média e do desvio-padrão. Note também que os resultados indicam que o estimador é consistente, pois à medida que se eleva $n$, a variância do estimador reduz consideravelmente.
 
 
