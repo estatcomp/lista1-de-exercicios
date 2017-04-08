@@ -15,7 +15,7 @@ Divisão das questões:
 * *Questão 4*: Pedro & Ricardo ( _ )
 * *Questão 5*: André & Daniel ( _ )
 * *Questão 6*: Guedes & Henrique ( _ )
-* *Questão 7*: Heidi & Elainy ( _ )
+* *Questão 7*: Heidi & Elainy ( x )
 * *Questão 8*: Cindy & Katherine ( X )
 * *Questão 9*: Nicolas & Thaís ( _ )
 * *Questão 10*: Rodney & Mario ( X )
