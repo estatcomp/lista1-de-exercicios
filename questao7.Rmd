@@ -1,0 +1,55 @@
+---
+title: "Questão 7"
+author: "Elainy e heidi "
+date: "8 de abril de 2017"
+output: html_document
+---
+
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Questão 7.** Determinar uma estimativa de Monte Carlo para:
+
+$$\int_{0}^{\pi/3}\sin (t) dt$$
+
+
+e comparar a estimativa com o valor exato da integral.
+
+
+**Solução:**
+
+Primeiramente vamos fazer uma tranformação de variáveis, de modo que o novo intervalo de integração seja (0,1)
+
+
+$$ y = \frac{t-0}{\frac{\pi}{3}-0} = \frac{3t}{\pi}  \\ dy= \frac{3}{\pi} dt$$
+
+Dessa forma, temos que
+
+
+$$ \int_{0}^{\pi/3}\sin (t) dt = \frac{\pi}{3}\int_{0}^{1}\sin (\frac{y\pi}{3}) dy $$
+
+O que vamos fazer agora é
+
+- Gerar $y_{i}$ com distribuição U[0,1];
+- Obter $g(y_{i})= sin(\frac{y_{i}\pi}{3})$;
+- Obter a estimativa da integral: $\hat{\theta}=\frac{\pi}{3}g(\bar{y})$;
+- Calcular o valor exato da integral.
+
+
+```{r,}
+
+n <- 1e7
+y <- runif(n, 0, 1) #gerando U[0,1]
+gx <- sin(y*(pi/3)) #aplicando na função
+gb <- mean(gx) # calculando a média
+theta <- gb*(pi/3) #estimativa da integral pelo método de Monte Carlo
+theta
+
+valor_exato  <- (-cos(pi/3)+cos(0)) #Valor exato da integral
+valor_exato
+
+```
+
+
