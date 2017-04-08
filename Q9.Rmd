@@ -1,0 +1,74 @@
+---
+title: "Questão 9"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exercício 9
+
+Use o Método de Variáveis Antitéticas para estimar
+
+$$\int_{0}^{1} \frac{e^{-x}} {1+x^2} dx$$
+
+e determine o percentual de redução de variância quando compara-se este resultado àquele sem a técnica de redução de variância.
+
+**Solução:**
+Queremos estimar 
+$$\theta= E\Big[\frac{e^{-U}} {1+U^2}\Big] = \int_{0}^{1} \frac{e^{-u}} {1+u^2} du$$
+expressão na qual $U \sim (0,1)$.
+
+Se $m$ replicatas de Monte Carlo são necessárias, então:
+
+1. Gere $u_1,…,u_{m/2} \sim U(0,1)$
+
+```{r}
+m = 1e6
+U = runif(m/2)
+```
+
+2. Gere $Y_i=\frac{e^{-u}} {1+u^2}$
+
+3. Gere  $W_i=\frac{e^{-(1-u)}} {1+(1-u)^2}$
+
+4. Retornar $\widehat{\theta}=\frac{2}{m}\sum_{i=1}^{m/2} (\frac{Y_i+W_i}{2})$.
+
+```{r}
+theta.estimado <- function(U){
+
+  y =exp(-U)/(1+U^2)
+  w =exp(U-1)/(1+(1-U)^2)
+  return(mean((y+w)/2))
+}
+
+theta.estimado(U)
+```
+Assim encontramos a estimativa de `r theta.estimado(U)` para $\theta$.
+
+Para comparar o estimador encontado com aquele sem a técnica de redução de variância replicamos 1000 vezes a simulação e calculamos a variância amostral para cada estimador.
+
+```{r}
+theta.sem.red <- function(U){
+  fx =exp(-U)/(1+U^2)
+  return(mean(fx))
+}
+mc1 = replicate(1000, theta.sem.red(runif(1000)))
+mc2 = replicate(1000, theta.estimado(runif(1000)))
+
+```
+
+Seja $\widehat{\theta}_1$ o estimador encontrado sem a técnica de redução de variância e $\widehat{\theta}_2$ o estimador com redução de variância, encontramos que $SD(\widehat{\theta}_1)$=`r round(sd(mc1),5)` e $SD(\widehat{\theta}_2)$=`r round(sd(mc2),5)`.
+
+Se temos 2 estimadores, $θ_1$ e  $θ_2$, e $V(θ_2)<V(θ_1)$, então o percentual de redução de variância é:
+
+$$ 100 (\frac{V(\widehat{\theta}_1)-V(\widehat{\theta}_2)} {V(\widehat{\theta}_1)})\%$$
+
+Portanto, temos que o percentual de redução de variância será de `r round(100*(var(mc1)-var(mc2))/var(mc1), 2)`% :
+
+```{r}
+round(100*(var(mc1)-var(mc2))/var(mc1), 2)
+```
+
+

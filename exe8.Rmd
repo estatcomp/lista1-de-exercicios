@@ -1,0 +1,71 @@
+---
+title: "Exercício 8"
+author: "Cindy & Katherine "
+date: "8 de abril de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Gostaríamos de estimar 
+
+\[\Phi(x)=P(X\leq x)=\int_{-\infty}^x \dfrac{1}{\sqrt{2\pi}}\exp(-t^2/2) dt,\]
+
+Pela simetría da distribuição normal padrão essa estimação se reduce a estimar para $x>0$
+
+\[\begin{equation} 
+\theta=\int_0^x \dfrac{1}{\sqrt{2\pi}}\exp(-t^2/2) dt,
+\end{equation}\]
+
+vamos obter duas estimativas de $\theta$,  a primeira usando uma a.a. de uniformes em (0,1) e outra gerando uniformes em $(0,x).$, para um valor de $x>0.$ previamente fixado. Finalmente para obtermos as estimativas para $\Phi(x)$ usamos
+
+$$\widehat{\Phi(x)}=\hat{\theta}+0.5,$$
+a implementação do algoritmo usando estimação por Monte Carlo é apresentado a continuação, para o valor $x=1.5$. 
+
+
+
+```{r}
+#usando uniformes (0,1)
+
+m <-1000;
+n <-200;
+x <-1.5;
+alpha=0.05;
+cdf <- replicate(m, {
+  u <-runif(n)
+  g<-(x*exp((-(u*x)^2)/2))/sqrt(2*pi)
+  mean(g)+0.5})
+media1 <- mean(cdf);
+v1<- var(cdf);
+ic1<-round(media1 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) * sqrt(v1/m), 4)
+print(media1)
+print(v1)
+print(ic1)
+
+
+```
+
+
+```{r}
+#Usando uniformes (0,x)
+
+x <- 1.5;
+n <-1000;
+m <-200;
+alpha=0.05;
+cdf <- replicate(m, {
+  u <-runif(n, 0, x)
+  g<-(exp((-(u)^2)/2))/sqrt(2*pi)
+  x*mean(g)+0.5})
+media2 <- mean(cdf);
+v2<- var(cdf);
+ic2<-round(media2 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) *sqrt(v2/m), 4)
+print(media2)
+print(v2)
+print(ic2)
+```
+
+
+

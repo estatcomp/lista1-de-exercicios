@@ -10,13 +10,13 @@
 Divisão das questões:
 
 * *Questão 1*: Fernando & Rafael ( _ )
-* *Questão 2*: Telma & Fabiana ( _ )
+* *Questão 2*: Telma & Fabiana ( X )
 * *Questão 3*: Rodney & Mario ( X )
 * *Questão 4*: Pedro & Ricardo ( _ )
 * *Questão 5*: André & Daniel ( _ )
 * *Questão 6*: Guedes & Henrique ( _ )
 * *Questão 7*: Heidi & Elainy ( _ )
-* *Questão 8*: Cindy & Katherine ( _ )
+* *Questão 8*: Cindy & Katherine ( X )
 * *Questão 9*: Nicolas & Thaís ( _ )
 * *Questão 10*: Rodney & Mario ( X )
 
