@@ -1,0 +1,201 @@
+---
+title: Lista 1 de exercícios
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+***
+
+```{r setup, include=FALSE}
+# <r code> ========================================================== #
+library(knitr)
+
+opts_chunk$set(cache=TRUE
+               , cache.path="cache/"
+               , fig.path="iBagens/"
+               , dpi=100
+               , fig.align="center"
+               , comment=NA
+               , warning=FALSE
+               , error=FALSE
+               , message=FALSE)
+
+options(width=100)
+# </r code> ========================================================= #
+```
+
+# Exercício 1
+***
+
+# Exercício 2
+***
+
+# Exercício 3
+***
+
+# Exercício 4
+***
+
+# Exercício 5
+***
+
+# Exercício 6
+***
+
+**Use simulação de Monte Carlo para investigar a taxa empírica do Erro
+  Tipo I do teste-*t*. Verifique se estes são aproximadamente iguais ao
+  valor nominal \(\alpha\) quando a população amostrada não segue uma
+  distribuição normal. Discuta estes casos quando as distribuições 
+  seguem:**
+
+* \(\chi^{2}\) (1)
+
+* Uniforme (0, 2)
+
+* Exponencial (1)
+
+**Para cada caso, teste \(H_{0}: \mu = \mu_{0}\) vs.
+  \(H_{1}: \mu \neq \mu_{0}\), onde \(\mu_{0}\) é a esperança de
+  \(\chi^{2}\) (1), Uniforme (0, 2) e Exponencial (1), 
+  respectivamente.**
+
+**Solução:**
+
+O teste-*t* é um teste utilizado para rejeitar ou não uma hipótese nula
+quando a estatística de teste segue uma distribuição *t* de Student.
+
+No nosso caso, faremos o teste sob \(H_{0}: \mu = 1\) vs.
+\(H_{1}: \mu \neq 1\) e considerando a variância populacional
+\(\sigma^{2}\) desconhecida. Com as parametrizações consideradas, todas
+as distribuições estudadas tem esperança 1. Vamos verificar a taxa
+empírica do Erro do Tipo I quando a população  não segue uma
+distribuição normal.
+
+Seja \(\ x_{1}, x_{2}, \dots, x_{n}\) valores amostrais da distribuição
+estudada, então a estatística do teste será dada por:  
+
+\[ T = \frac{\bar{X} - \mu}{S / \sqrt{n}} \sim t_{(n - 1)}. \]
+ 
+Observe que rejeitamos \(H_{0}\) para grandes valores da estatística de
+teste \(T\), indicando que a média não é igual a 1. 
+
+Para determinar o valor crítico \(K\), com o qual comparamos a
+estatística do teste, para tomar a decisão de rejeitar ou não a
+hipótese nula, fixamos um \(\alpha = 5\%\). Então se
+\(P(|T| > k) = \alpha\), tomamos a decisão de rejeitar \(H_{0}\).
+Temos então que o valor de \(K\) é dado por:
+
+\[ K = qt_{(1 - \alpha / 2 ; n - 1)}. \]
+
+Este nada mais é do que o quantil \(1 - \alpha / 2\) da distribuição 
+\(T\) com \(n - 1\) graus de liberdade.
+
+No nosso estudo do Erro do tipo I empírico, geraremos as amostras a
+partir das distribuições que tem média (verdadeira) \(\mu = 1\).
+Faremos então o teste e calcularemos a proporção de vezes que o teste
+rejeita \(H_0\). Esta proporção será a estimativa do Erro do Tipo I.
+
+Repetiremos o processo para uma amostra de tamanho
+\(n = 20, 100, \text{e } 500\), 10000 mil vezes. Faremos isso para cada
+das distribuições e comentaremos então os resultados. 
+
+```{r}
+# <r code> ========================================================== #
+## Criando a função que gera as amostras,
+## calcula a estatística do teste e obtém as taxas do Erro Tipo 1
+ex6 <- function(type = "normal", size, mu = 1, m = 10000, alpha = .05){
+  t.stat <- replicate(m, {
+    switch(type
+           , normal = {x <- rnorm(n = size, mean = 1, sd = .25)}
+           , chi = {x <- rchisq(n = size, df = 1)}
+           , unif = {x <- runif(n = size, min = 0, max = 2)}
+           , expo = {x <- rexp(n = size, rate = 1)}
+           )
+    ( mean(x) - mu ) / ( sd(x) / sqrt(size) )
+  })
+  mean( t.stat > qt(1 - alpha, size - 1) )
+# </r code> ========================================================= #
+}
+```
+
+```{r, results='hold'}
+# <r code> ========================================================== #
+## Gerando as amostras,
+## calculando a estatística do teste e obtendo as taxas do Erro Tipo 1
+set.seed(93)
+
+results <- data.frame(
+  `Distribuição` = rep(
+    c("Normal", "Chi quadrado", "Uniforme", "Exponencial"), each = 3)
+  , `Tamanho amostral` = rep(c("20", "100", "500"), 4)
+  , `Taxa empírica` = c(
+    unlist(lapply(c(20, 100, 500), ex6, type = "normal"))
+    , unlist(lapply(c(20, 100, 500), ex6, type = "chi"))
+    , unlist(lapply(c(20, 100, 500), ex6, type = "unif"))
+    , unlist(lapply(c(20, 100, 500), ex6, type = "expo"))
+  ))
+results$`Distribuição` <-
+  with(results
+       , factor(`Distribuição`, levels(`Distribuição`)[c(3, 1, 4, 2)]))
+results$`Tamanho.amostral` <-
+  with(results, factor(
+    `Tamanho.amostral`, levels(`Tamanho.amostral`)[c(2, 1, 3)]))
+results
+# </r code> ========================================================= #
+```
+
+```{r, fig.width=10, fig.show='hold'}
+# <r code> ========================================================== #
+## Visualizando os resultados graficamente
+library(latticeExtra)
+
+barchart(`Taxa.empírica` ~ `Tamanho.amostral` | `Distribuição`
+         , data = results
+         , horizontal = FALSE
+         , border = "transparent"
+         , col = "#0080ff"
+         , scales = list(y = list(draw = FALSE))
+         , xlab = "Tamanho amostral"
+         , ylab = list("Erro Tipo I", rot = 0)
+         , main = "Taxa empírica do Erro Tipo I do teste-t"
+         , strip = strip.custom(bg = "white")
+         , ylim = c(0, max(results$`Taxa.empírica`) + .005)
+         , layout = c(4, 1)
+         , panel = function(...){
+           panel.barchart(...)
+           args <- list(...)
+           panel.text(args$x, args$y, args$y, pos = 3)
+         })
+# </r code> ========================================================= #
+```
+
+Observe que tanto a distribuição Uniforme (0, 2) quanto a
+Normal (1, 0.25) foram as que tiveram os valores mais próximos do valor
+esperado \(\alpha = 5\%\). Isso talvez pode ser explicado pela simetria
+das distribuições em relação à média. Como a \(\chi^{2}\) (1) e
+Exponencial (1) não são simétricas, tiveram resultados mais longe do
+esperado. 
+
+É válido ressaltar que a distribuição \(\chi^{2}\) (1) foi a que obteve
+a menor taxa de Erro do Tipo I. É possível observar também que com um
+aumento do tamanho da amostra, os resultados tendem a ser mais
+consistentes e se aproximam mais do valor esperado, para todas as
+distribuições analisadas.
+
+# Exercício 7
+***
+
+# Exercício 8
+***
+
+# Exercício 9
+***
+
+# Exercício 10
+***
+
+***
+***
