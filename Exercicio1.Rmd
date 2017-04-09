@@ -1,0 +1,104 @@
+---
+title: "Questão 1"
+author: 
+date: "5 de abril de 2017"
+output: pdf_document
+fig_caption: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+Questão 1 - A distribuição de Pareto ($\alpha,\beta$) tem a seguinte distribuição
+
+
+
+$$ F(x) = 1-(\beta /x)^\alpha $$
+
+Expressão na qual x >=b, a>0. Apresente um algorítimo para geração de variáveis aleatórias para esta distribuição. Usando R, simule uma amostra para Pareto(2,2). Apresente o histograma da amostra combinado com a densidade teórica da mesma para comparação.
+
+
+
+$\bold{Resposta:}$
+
+
+O algorítimo para geração de variáveis aleatórias para esta distribuição se baseia na geração de variáveis aleatórias pelo método da inversão.
+
+Segundo o teorema da Probabilidade da Transformação Integral (Rizzo,2008), se X é uma variável aleatória continua com distribuição $F_x (x)$, então U = $F_x (x)$ ~ U (0,1).
+
+Assim, 
+
+$$F_x^{-1}(u)= inf [x : F_x (x)=u] , 0<u<1.$$
+
+
+Calculando a inversa de F(x), temos que $F_x^{-1}(u)$ é descrita por:
+
+$$x =b/(1-u)^{1/a}$$ 
+
+
+O algorítimo para geração de um conjunto de valores aleatórios uniformes, então,
+
+````(r)
+
+u <-runif(1e6)
+
+func.inver <- function(a,b){
+  
+  x>=b
+  
+  a>0
+  
+  gx = b/(1-u)^(1/a)
+  
+  return(gx)
+  
+}
+
+````
+
+A partir desta função, gerou-se um número grande variáveis aleatórias (u), e substituiu-se na função inversa:
+
+```(r)
+
+func.inver(2,2,u)
+
+
+````
+
+
+O histograma desta função, com os parâmetros dados e aproximando a distribuição para uma uniforme [0,1], temos:
+
+
+
+![](hist_func_inver.jpeg)
+
+
+Em seguida, gerou-se variáveis aleatórias a distribuição dada, Pareto(2,2):
+
+````(r)
+
+rpareto(1000,2,2)
+
+````
+
+
+Por fim, comparando-se o histograma das duas distribuições, a teórica e a estimada, temos:
+
+
+![Histograma Combinado](hist_comb.jpeg)
+
+
+
+
+
+
+
+
+
+
+
+  
