@@ -21,5 +21,3 @@ Divisão das questões:
 * *Questão 10*: Rodney & Mario ( X )
 
 ***
-
-teste
