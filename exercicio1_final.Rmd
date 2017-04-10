@@ -1,0 +1,112 @@
+---
+title: "Questão 1"
+author: 
+date: "5 de abril de 2017"
+output: pdf_document
+fig_caption: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+Questão 1 - A distribuição de Pareto ($\alpha,\beta$) tem a seguinte distribuição
+
+
+
+$$ F(x) = 1-(\beta /x)^\alpha $$
+
+Expressão na qual x >=b, a>0. Apresente um algorítimo para geração de variáveis aleatórias para esta distribuição. Usando R, simule uma amostra para Pareto(2,2). Apresente o histograma da amostra combinado com a densidade teórica da mesma para comparação.
+
+
+
+$\bold{Resposta:}$
+
+
+O algorítimo para geração de variáveis aleatórias para esta distribuição se baseia na geração de variáveis aleatórias pelo método da inversão.
+
+Segundo o teorema da Probabilidade da Transformação Integral (Rizzo,2008), se X é uma variável aleatória continua com distribuição $F_x (x)$, então U = $F_x (x)$ ~ U (0,1).
+
+Assim, 
+
+$$F_x^{-1}(u)= inf [x : F_x (x)=u] , 0<u<1.$$
+
+
+Calculando a inversa de F(x), temos que $F_x^{-1}(u)$ é descrita por:
+
+$$x =b/(1-u)^{1/a}$$ 
+
+
+O algorítimo para geração de um conjunto de valores aleatórios uniformes, então,
+
+```{r}
+
+
+
+func.inver <- function(a,b,Nsimu = 1e6){
+# Difine intervalos (a,b) e gera Nsimu variáveis
+
+  # Gerar Nsimu uniformes (a,b)
+  u <-runif(Nsimu)  
+
+  # Gerar Nsimu variáveis aleatórias pela inversão
+  gx = b/((1-u)^(1/a))
+  
+  return(gx)
+  
+}
+
+```
+
+A partir desta função, gerou-se um número grande variáveis aleatórias (u), e substituiu-se na função inversa:
+
+```{r}
+
+set.seed(42017)
+X = func.inver(2,2)
+
+```
+
+
+O histograma desta função, com os parâmetros dados, temos:
+
+```{r}
+hist(X)
+```
+
+Como a Pareto é uma distribuição para valores extremos, visualizações de toda a amostra gerada por um histograma não é muito informativa, pois a maior observação chega a ter valor `r max(X)`. Teoricamente, quando `x = 20`, temos que $F(20) = 0.99$. De fato, nas `1e6` variáveis geradas, `r as.numeric(table(X>20)[2]/1e6)*100`% são maiores que $20$.
+Assim, vamos representar o histograma até o valor `x=20` para que possamos ter uma melhor visualização dos dados.
+
+Em seguida, define-se a densidade de Pareto
+
+```{r}
+  # Densidade da Pareto(2,2)
+  dpareto=function(x, a=2, b=2) a*b^a/x^(a+1)
+
+```
+
+
+Por fim, comparando-se o histograma das duas distribuições, a teórica e a estimada, temos:
+
+
+```{r}
+# Histograma das variáveis geradas
+hist(subset(X, X <= 20)) 
+# Curva da distribuição teórica da Pareto(2,2)
+lines(2:20, dpareto(2:20)*1e6, col = "red")
+```
+
+
+
+
+
+
+
+
+
+
+
+  
