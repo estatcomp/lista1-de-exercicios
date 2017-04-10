@@ -30,17 +30,405 @@ options(width=100)
 # Exercício 1
 ***
 
+
+
+Questão 1 - A distribuição de Pareto ($\alpha,\beta$) tem a seguinte distribuição
+
+
+
+$$ F(x) = 1-(\beta /x)^\alpha $$
+
+Expressão na qual x >=b, a>0. Apresente um algorítimo para geração de variáveis aleatórias para esta distribuição. Usando R, simule uma amostra para Pareto(2,2). Apresente o histograma da amostra combinado com a densidade teórica da mesma para comparação.
+
+
+
+$\bold{Resposta:}$
+
+
+O algorítimo para geração de variáveis aleatórias para esta distribuição se baseia na geração de variáveis aleatórias pelo método da inversão.
+
+Segundo o teorema da Probabilidade da Transformação Integral (Rizzo,2008), se X é uma variável aleatória continua com distribuição $F_x (x)$, então U = $F_x (x)$ ~ U (0,1).
+
+Assim, 
+
+$$F_x^{-1}(u)= inf [x : F_x (x)=u] , 0<u<1.$$
+
+
+Calculando a inversa de F(x), temos que $F_x^{-1}(u)$ é descrita por:
+
+$$x =b/(1-u)^{1/a}$$ 
+
+
+O algorítimo para geração de um conjunto de valores aleatórios uniformes, então,
+
+````(r)
+
+u <-runif(1e6)
+
+func.inver <- function(a,b){
+  
+  x>=b
+  
+  a>0
+  
+  gx = b/(1-u)^(1/a)
+  
+  return(gx)
+  
+}
+
+````
+
+A partir desta função, gerou-se um número grande variáveis aleatórias (u), e substituiu-se na função inversa:
+
+```(r)
+
+simu = func.inver(2,2,u)
+
+
+````
+
+
+O histograma desta função, com os parâmetros dados e aproximando a distribuição para uma uniforme [0,1], temos:
+
+
+
+![](hist_func_inver.jpeg)
+
+
+Em seguida, gerou-se variáveis aleatórias a distribuição dada, Pareto(2,2):
+
+````(r)
+
+rpareto(1000,2,2)
+
+````
+
+
+Por fim, comparando-se o histograma das duas distribuições, a teórica e a estimada, temos:
+
+
+![Histograma Combinado](hist_comb.jpeg)
 # Exercício 2
 ***
+Questão 2:
+
+Geramos amostras de uma distribuição de interesse a partir da geração de de uma distribuição conhecida e então, rejeitando um subconjunto gerado. O mecanismo de rejeição é construído de forma que, a amostra que será aceita segue a distribuição de interesse.
+Queremos gerar valores aleatórios de uma densidade de probabilidade $f$ definida em um algum conjunto $X$.
+ Seja $g$ uma densidade em $X$ a partir da qual sabemos gerar valores aleatórios e com a propriedade de que
+$f(X) < c*g(X)$, para todo $x \in X$ e alguma constante $c$.
+
+Geramos um elemento $x$ a partir da densidade $g$ e aceitamos o elemento com probabilidade $f(x)/cg(X)$, ou seja,
+$$
+P(\text{Aceitar}|Y) = P\left(U < \frac{f(Y)}{cg(Y)}|Y\right) = \frac{f(Y)}{cg(Y)}.
+$$
+Note ainda que a probabilidade total de aceitar $Y$ pode ser calculada da seguinte maneira:
+$$
+\sum_{n}P(\text{Aceitar}|y)P(Y=y)=\sum_{n}\frac{f(y)}{cg(y)}g(y)=\frac{1}{c}.
+$$
+Agora possuimos todos os elementos para mostrar, pelo menos no caso discreto, que o método de aceitação e rejeição gera, de fato, números aleatórios da distribuição de interesse. Para a prova utilizamos o teorema de Bayes.
+
+Suponha um $k$ qualquer de modo que $f(k)>0$, então pelo teorema de Bayes temos que: 
+$$
+P(k|\text{Aceitar})=\frac{P(\text{Aceitar}|k)g(k)}{P(\text{Aceitar})} = \frac{[f(k)/(cg(k))]g(k)]}{1/c} = f(k)
+$$
+
+Este método pode ser implementado ao gerar um elemento $u$ distribuido uniformemente em (0,1) e então, aceitamos se $u < f(x)/cg(x)$. 
+Se $x$ é rejeitado, um novo candidato é amostrado de $g$ e repetimos o teste de aceitação. 
+O processo se repete até que o teste de aceitação gere a quantidade desejada de números aleatórios; os valores aceitos são elementos com distribuição $f$.
+
+Algoritmo
+O algoritmo do método de aceitação-rejeição pode ser apresentado nos passos abaixo.
+\begin{enumerate}
+\item{Simula-se o valor $x$ com densidade $g$ }
+\item{Gera-se um número aleatório $u \sim \text{Unif}(0,1)$}
+\item{Se $u < f(x)/cg(x)$, aceita-se o valor e para. Caso contrário, retorna-se ao passo 1.}
+\end{enumerate}
 
 # Exercício 3
 ***
 
+No código a seguir, simulamos uma amostra da variável Epanechnikov usando o algoritmo descrito na questão e, em seguida, construimos um histograma das variáveis geradas. 
+```{r}
+# densidade Epanechnikov
+d_epach = function(x) 3*(1 - x^2)/4
+# função para gerar variáveis aleatórias com distribuição Epanechnikov
+r_epach = function(n){
+  v = rep(0,n)
+  for(i in 1:n){
+    u1 = runif(1,-1,1); u2 = runif(1,-1,1); u3 = runif(1,-1,1);
+    if((abs(u3)>abs(u2))&&(abs(u3)>abs(u1))){
+      v[i] = u2
+    }else{
+      v[i] = u3
+    }
+  }
+  return(v)
+}
+
+# histograma de uma amostra da Epanechnikov e a densidade verdadeira
+hist(r_epach(100000),prob=TRUE,main="Histograma - núcleo de Epanechnikov",
+     ylim=c(0,1),ylab="Densidade",xlab="")
+curve(d_epach, xlim=c(-1,1),add=TRUE,col=2,lwd=2)
+```
+
+Comparando o histograma com a densidade Epanechnikov, vemos que os valores simulados estão bastante próximos da densidade teórica.
+
+Nessa parte vamos provar que o algoritmo de fato gera valores da densidade Epanechnikov, primeiro utilizamos integrais para encontrar a função de distribuição desejada e verificamos que o algoritmo é adequado. Depois resolvemos de outro método, utilizando estatística de ordem para facilitar a resolução . 
+
+1º Método
+
+Sabemos que $U_i \sim U(-1,1)$, $i\in\{1,2,3\}$, daí a função de distribuição de $U_i$ é 
+$$
+F_U(u) = \frac{u+1}{2},
+$$
+então, para $Y_i = |U_i|$ temos que
+$$
+F_{Y_i}(y) = P(|U_i| \leq y) = P(-y \leq U_i \leq y) = F_{U_i}(y) - F_{U_i}(-y) = \left(\frac{y+1}{2}\right) - \left(\frac{-y+1}{2}\right) = y,
+$$
+ou seja, $Y_i \sim U(0,1)$, $i\in\{1,2,3\}$.
+
+Sendo $X$ a variável aleatória gerada de acordo com o algoritmo descrito na questão, temos que
+$$
+X = \left\{\begin{array}{cc}
+U_2 & \textrm{se } |U_3|>max\{|U_1|,|U_2|\}\\
+U_3 & \textrm{se } |U_3|\leq max\{|U_1|,|U_2|\}\\
+\end{array}\right.,
+$$
+e como $U_2$ e $U_3$ são simétricas em torno de zero, pelo algoritmo temos que $X$ também o será. Logo, $P(X<0) = 1/2$. Considerando então $0<x<1$, temos que
+\begin{align*}
+P(|X|\leq x) &= P(|U_3|>max\{|U_1|,|U_2|\},|U_2|\leq x) + P(|U_3| \leq max\{|U_1|,|U_2|\},|U_3|\leq x)\\
+&= P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) + P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x).
+\end{align*}
+
+Sabemos que a densidade de $Y_i$ é $f_{Y_i}(y) = 1$ para $0<y<1$. Assim, calculando a primeira probabilidade temos que
+\begin{align*}
+P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) &= P(Y_1\leq Y_2 \leq Y_3, Y_2\leq x) + P(Y_2\leq Y_2 \leq Y_3, Y_2\leq x)\\\
+&= \int_{0}^{x}\int_{0}^{y_2}\int_{y_2}^{1}dy_3dy_1dy_2 + \int_{0}^{x}\int_{y_2}^{1}\int_{y_1}^{1}dy_3dy_1dy_2\\
+&= \int_{0}^{x}\int_{0}^{y_2}(1-y_2)dy_1dy_2 + \int_{0}^{x}\int_{y_2}^{1}(1-y_1)dy_1dy_2\\
+&= \int_{0}^{x}(1-y_2)y_2dy_1dy_2 + \int_{0}^{x}\left[\left.(y_1-\frac{y_1^2}{2})\right|_{y_2}^{1}\right]dy_2\\
+&= \left.\left(\frac{y_2^2}{2}-\frac{y_2^3}{3}\right)\right|_0^x + \int_{0}^{x}\left[1 - \frac{1}{2} - y_2 + \frac{y_2^2}{2} \right]dy_2\\
+&= \frac{x^2}{2}-\frac{x^3}{3} + \left.\left[\frac{y_2}{2} - \frac{y_2^2}{2} + \frac{y_2^3}{6} \right]\right|_0^x\\
+&= \frac{x^2}{2}-\frac{x^3}{3} + \frac{x}{2}-\frac{x^2}{2} + \frac{x^3}{6} = \frac{x}{2} - \frac{x^3}{6}\\
+\end{align*}
+
+Na segunda probabilidade, temos que
+\begin{align*}
+P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= P(Y_3\leq Y_2 \leq Y_1, Y_3\leq x) + P(Y_2\leq Y_3 \leq Y_1, Y_3\leq x) \\
+&+ P(Y_3\leq Y_1 \leq Y_2, Y_3\leq x) + P(Y_1\leq Y_3 \leq Y_2, Y_3\leq x)\\
+&= 2[P(Y_3\leq Y_2 \leq Y_1, Y_3\leq x) + P(Y_2\leq Y_3 \leq Y_1, Y_3\leq x)],
+\end{align*}
+onde na primeira igualdade listamos as possíveis formas que o evento $[Y_3>max\{Y_1,Y_2\},Y_3\leq x]$ pode ocorrer e na segunda igualdade usamos o fato de $Y_1$ e $Y_2$ serem identicamente distribuídas. Daí
+\begin{align*}
+P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= 2\left[ \int_{0}^{x}\int_{y_3}^{1}\int_{y_2}^{1}dy_1dy_2dy_3 + \int_{0}^{x}\int_{0}^{y_3}\int_{y_3}^{1}dy_1dy_2dy_3 \right]\\
+&= 2\left[ \int_{0}^{x}\int_{y_3}^{1}(1-y_2)dy_2dy_3 + \int_{0}^{x}\int_{0}^{y_3}(1-y_3)dy_2dy_3 \right]\\
+&= 2\left[ \int_{0}^{x}\left[\left.(y_2-\frac{y_2^2}{2})\right|_{y_3}^{1}\right]dy_3 + \int_{0}^{x}(1-y_3)y_3dy_3 \right]\\
+&= 2\left[ \int_{0}^{x}\left[\frac{1}{2} - y_3 + \frac{y_3^2}{2}\right]dy_3 + \left.\left(\frac{y_3^2}{2}-\frac{y_3^3}{3}\right)\right|_0^x \right]\\
+&= 2\left[ \left.\left[\frac{y_3}{2} - \frac{y_3^2}{2} + \frac{y_3^3}{6} \right]\right|_0^x + \frac{x^2}{2}-\frac{x^3}{3} \right]\\
+&= 2\left[ \frac{x}{2} - \frac{x^2}{2} + \frac{x^3}{6} + \frac{x^2}{2}-\frac{x^3}{3} \right] = x - \frac{x^3}{3}\\
+\end{align*}
+
+Portanto,
+$$
+P(|X|\leq x) = \frac{x}{2} - \frac{x^3}{6} + x - \frac{x^3}{3} = \frac{3x}{2} - \frac{3x^3}{6} = \frac{3x - x^3}{2},
+$$
+e pela simetria de $X$, temos que 
+$$
+P(X\leq x) = P(X\leq 0) + P(0<X\leq x) = \frac{1}{2} + \frac{P(|X|\leq x)}{2} = \frac{1}{2} + \frac{3x - x^3}{4},
+$$
+onde $0<x<1$. Novamente usando o fato da distribuição de $X$ ser simétrica, temos para $0<x<1$ que
+$$
+F_X(-x) = 1 - F_X(x) = 1 - \left[ \frac{1}{2} + \frac{3x - x^3}{4} \right] 
+= \frac{1}{2} - \frac{(3x - x^3)}{4} 
+= \frac{1}{2} + \frac{3(-x) - (-x)^3}{4},
+$$
+ou seja, a função de distribuição de $X$ é $F_X(x) = 1/2 + (3x - x^3)/4$, para $x\in[-1,1]$, e derivando $F_X(x)$ em relação a $x$ obtemos a função densidade de $X$, que é
+$$
+f_X(x) = \frac{3(1-x^2)}{4}, \quad -1\leq x \leq 1,
+$$
+assim, vemos que $X$ tem distribuição Epanechnikov, e o método de geração está correto.
+
+2º Método
+
+Note que o algoritmo proposto pode ser encarado como uma mistura de distribuições das estatísticas de ordem 1 e 2 para três uniformes com parametrização $(0,1)$.
+
+Portanto, é razoável afirmar que a distribuição desejada pode ser obtida da seguinte forma:
+
+\begin{equation}\label{eq:estordem}
+f^{\ast}(u)=\frac{1}{2}f_{(1)}(u)+\frac{1}{2}f_{(2)}(u).
+\end{equation}
+Note que está é uma afirmação, que será provada verdadeira caso a distribuição obtida seja, de fato, a que buscamos
+
+Sabemos que a distribuição genérica de uma estatística de ordem qualquer é dada da seguinte maneira
+
+$$
+f_{(k)}(x) = \frac{n!}{(k-1)!(n-k)!} \left[F_{X}(x)\right]^{k-1} \left[1-F_{X}(x)\right]^{n-k}f_{X}(x)
+$$
+Adaptando para o nosso caso temos que:
+
+$$
+f_{(1)}(u)=3(1-u)^{2}
+$$
+e
+
+$$
+f_{(2)}(u)=3u(1-u),
+$$
+isso porque para uma distribuição uniforme (0,1),
+
+$$
+F_{X}=\frac{x-a}{b-a}=x
+$$
+e
+$$
+f_{X}=\frac{1}{b-a}=1
+$$
+
+Substituindo $f_{(1)}$ e $f_{(2)}$ na equação \eqref{eq:estordem} temos que:
+
+\begin{equation}\label{eq:densepac}
+f^{\ast}(u)=\frac{3}{2}(1-u)^{2} + \frac{3}{2}u(1-u) = \frac{3}{2}\left(1-u^2\right), u<1
+\end{equation}
+
+Observe que $u$ na equação acima está definida apenas para $u<1$, mas pela simetria da distribuição podemos dividir a equação \eqref{eq:densepac} por 2 para obter a função de distribuição no domínio desejado, que é $|u|<1$.
+
+$$
+f^{\ast}(u)=\frac{\frac{3}{2}(1-u)^{2} + \frac{3}{2}u(1-u)}{2} = \frac{3}{4}\left(1-u^2\right), |u|< 1
+$$
+
 # Exercício 4
 ***
 
+# Resolução do Algoritmo
+
+* Elaborração do algoritimo para a Razão de gini;
+* Estimar $\mu$ por simulação e obtendo $\bar{X}$ de cada amostra gerada das dist. $logN(0,1), U(0,1) e Bin(1,0.5)$; 
+* Gerar $10^6$ variáveis da distribuicões citadas acima e ordena-las em ordem crescente;
+* Cada distribuição recebeu um índice que identifica qual esta sendo usada na fução: 1= logNormal, 2=Uniforme e 3=Binomial, para que a função escolha a função desejada;
+
+
+```{r estimador}
+gini=function(n,dist){
+  if ((dist< 1) | (dist >3)) stop("Valor interios deve estar entre 1 e 3!")
+  ki=NULL
+  gi=NULL
+  m=dist
+  if(m==1){
+  xb=mean(rlnorm(100,0,1))  
+  u=c(sort(rlnorm(n,0,1)))
+  } else 
+      if (m==2){
+        xb=mean(runif(100,0,1))  
+        u=c(sort(runif(n,0,1)))
+      } else 
+        if (m==3){
+          xb=mean(rbinom(100,1,0.5))  
+          u=c(sort(rbinom(n,1,0.5)))
+        } 
+      for(i in 1:n){
+        ki=c(ki,(2*i-n-1)*u[i]) 
+        gi=c(gi,sum(ki)/(n^2*xb))
+      }
+  return(gi)
+}
+
+```
+* As estimativas da quantidade de Gini para cada distribuição da variável aleatória são:
+
+```{r gini}
+gin1=gini(1000,1) #Lognormal
+gin2=gini(1000,2) #Uniforme
+gin3=gini(1000,3) #Binomial
+
+```
+
+* A estimativa da média, mediana e os decis da estatística de G gini para a amostra aleatória $x_{1},...,x_{n}$ da variável $X$ ultilizando as distribuiçoes é da seguinte forma:
+
+
+```{r estimativas}
+xbar1=mean(gin1) 
+xbar2=mean(gin2) 
+xbar3=mean(gin3) 
+md1=median(gin1)
+md2=median(gin2)
+md3=median(gin3)
+qt1=quantile(gin1,seq(0,1,0.1))
+qt2=quantile(gin2,seq(0,1,0.1))
+qt3=quantile(gin3,seq(0,1,0.1))
+```
+
 # Exercício 5
 ***
+
+```{r, echo=FALSE}
+
+
+################################ QUESTÃO 5 #####################################
+
+
+n = 1000 # tamanho de cada amostra
+
+j = 1 # contador do número de amostras (escolhi, arbitrariamente, 10000)
+
+r = 1 # registro relacionado a cada uma das amostras, para média amostral 
+	# xbar[r] = mean(x), constante de Gini ghatC[r] = 1/(n^2*xbar[r]), 
+	# e o somatório de 1 a n somaAmost[i]=(2*i-n-1)*xi[i], da fórmula de Gini 
+	# como função das estatísticas de ordem.
+
+xbar=0
+ghatC=0
+G=0  
+somaTot=0
+
+while(j<=10000){	# cálculo das j (10000) estimativas Gini 
+
+	x=rlnorm(n, meanlog = 0, sdlog = 1) # gera amostra aleatória lognormal
+	xbar[r]=mean(x)				# calcula x barra
+	ghatC[r]=(1/(n^2*xbar[r]))		# calcula a constante
+
+		xi=sort(x)				# ordena a amostra gerada
+
+			somaAmost=0				# laço para cálculo do somatório
+			for (i in 1:n)	{			 	
+			somaAmost[i]=(2*i-n-1)*xi[i]		
+						}			
+
+			somaTot[r]=sum(somaAmost)	# registrando cada um dos somatórios
+
+				G[j]=ghatC[r]*somaTot[r]	# cálculo da estimativa G
+					
+					j=j+1
+					r=r+1
+
+		}
+
+#### Construindo o IC ((1-alpha)*100%) para G
+
+media=mean(G)
+desvio=sd(G)	# desvio padrão das estimativas G
+zneg=-1.96		# z para alfa=0.025
+zpos=1.96		# z para alfa=0.975
+
+inf=media+zneg*desvio		# limite inferior do intervalo 
+sup=media+zpos*desvio		# limite superior do intervalo
+
+table(G<inf)	# se TRUE, valor simulado está abaixo do intervalo inferior
+a=matrix(table(G<inf))
+
+table(G>sup)	# se TRUE, valor simulado está acima do intervalo superior
+b=matrix(table(G>sup))
+
+#### valor (%) simulado fora do intervalo de 95%
+
+percent=100*((a[2,1]+b[2,1])/10000)	
+percent
+
+
+
+#################################### FIM ######################################
+
+```
+
 
 # Exercício 6
 ***
@@ -187,15 +575,225 @@ distribuições analisadas.
 
 # Exercício 7
 ***
+Determinar uma estimativa de Monte Carlo para:
+
+$$\int_{0}^{\pi/3}\sin (t) dt$$
+
+
+e comparar a estimativa com o valor exato da integral.
+
+
+**Solução:**
+
+Primeiramente vamos fazer uma tranformação de variáveis, de modo que o novo intervalo de integração seja (0,1)
+
+
+$$ y = \frac{t-0}{\frac{\pi}{3}-0} = \frac{3t}{\pi}  \\ dy= \frac{3}{\pi} dt$$
+
+Dessa forma, temos que
+
+
+$$ \int_{0}^{\pi/3}\sin (t) dt = \frac{\pi}{3}\int_{0}^{1}\sin (\frac{y\pi}{3}) dy $$
+
+O que vamos fazer agora é
+
+- Gerar $y_{i}$ com distribuição U[0,1];
+- Obter $g(y_{i})= sin(\frac{y_{i}\pi}{3})$;
+- Obter a estimativa da integral: $\hat{\theta}=\frac{\pi}{3}g(\bar{y})$;
+- Calcular o valor exato da integral.
+
+
+```{r,}
+
+n <- 1e7
+y <- runif(n, 0, 1) #gerando U[0,1]
+gx <- sin(y*(pi/3)) #aplicando na função
+gb <- mean(gx) # calculando a média
+theta <- gb*(pi/3) #estimativa da integral pelo método de Monte Carlo
+theta
+
+valor_exato  <- (-cos(pi/3)+cos(0)) #Valor exato da integral
+valor_exato
+
+```
+
+
 
 # Exercício 8
 ***
 
+
+Gostaríamos de estimar 
+
+\[\Phi(x)=P(X\leq x)=\int_{-\infty}^x \dfrac{1}{\sqrt{2\pi}}\exp(-t^2/2) dt,\]
+
+Pela simetría da distribuição normal padrão essa estimação se reduce a estimar para $x>0$
+
+\[\begin{equation} 
+\theta=\int_0^x \dfrac{1}{\sqrt{2\pi}}\exp(-t^2/2) dt,
+\end{equation}\]
+
+vamos obter duas estimativas de $\theta$,  a primeira usando uma a.a. de uniformes em (0,1) e outra gerando uniformes em $(0,x).$, para um valor de $x>0.$ previamente fixado. Finalmente para obtermos as estimativas para $\Phi(x)$ usamos
+
+$$\widehat{\Phi(x)}=\hat{\theta}+0.5,$$
+a implementação do algoritmo usando estimação por Monte Carlo é apresentado a continuação, para o valor $x=1.5$. 
+
+
+
+```{r}
+#usando uniformes (0,1)
+
+m <-1000;
+n <-200;
+x <-1.5;
+alpha=0.05;
+cdf <- replicate(m, {
+  u <-runif(n)
+  g<-(x*exp((-(u*x)^2)/2))/sqrt(2*pi)
+  mean(g)+0.5})
+media1 <- mean(cdf);
+v1<- var(cdf);
+ic1<-round(media1 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) * sqrt(v1/m), 4)
+print(media1)
+print(v1)
+print(ic1)
+
+
+```
+
+
+```{r}
+#Usando uniformes (0,x)
+
+x <- 1.5;
+n <-1000;
+m <-200;
+alpha=0.05;
+cdf <- replicate(m, {
+  u <-runif(n, 0, x)
+  g<-(exp((-(u)^2)/2))/sqrt(2*pi)
+  x*mean(g)+0.5})
+media2 <- mean(cdf);
+v2<- var(cdf);
+ic2<-round(media2 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) *sqrt(v2/m), 4)
+print(media2)
+print(v2)
+print(ic2)
+```
+
+
+
+
 # Exercício 9
 ***
 
+Use o Método de Variáveis Antitéticas para estimar
+
+$$\int_{0}^{1} \frac{e^{-x}} {1+x^2} dx$$
+
+e determine o percentual de redução de variância quando compara-se este resultado àquele sem a técnica de redução de variância.
+
+**Solução:**
+Queremos estimar 
+$$\theta= E\Big[\frac{e^{-U}} {1+U^2}\Big] = \int_{0}^{1} \frac{e^{-u}} {1+u^2} du$$
+expressão na qual $U \sim (0,1)$.
+
+Se $m$ replicatas de Monte Carlo são necessárias, então:
+
+1. Gere $u_1,…,u_{m/2} \sim U(0,1)$
+
+```{r}
+m = 1e6
+U = runif(m/2)
+```
+
+2. Gere $Y_i=\frac{e^{-u}} {1+u^2}$
+
+3. Gere  $W_i=\frac{e^{-(1-u)}} {1+(1-u)^2}$
+
+4. Retornar $\widehat{\theta}=\frac{2}{m}\sum_{i=1}^{m/2} (\frac{Y_i+W_i}{2})$.
+
+```{r}
+theta.estimado <- function(U){
+
+  y =exp(-U)/(1+U^2)
+  w =exp(U-1)/(1+(1-U)^2)
+  return(mean((y+w)/2))
+}
+
+theta.estimado(U)
+```
+Assim encontramos a estimativa de `r theta.estimado(U)` para $\theta$.
+
+Para comparar o estimador encontado com aquele sem a técnica de redução de variância replicamos 1000 vezes a simulação e calculamos a variância amostral para cada estimador.
+
+```{r}
+theta.sem.red <- function(U){
+  fx =exp(-U)/(1+U^2)
+  return(mean(fx))
+}
+mc1 = replicate(1000, theta.sem.red(runif(1000)))
+mc2 = replicate(1000, theta.estimado(runif(1000)))
+
+```
+
+Seja $\widehat{\theta}_1$ o estimador encontrado sem a técnica de redução de variância e $\widehat{\theta}_2$ o estimador com redução de variância, encontramos que $SD(\widehat{\theta}_1)$=`r round(sd(mc1),5)` e $SD(\widehat{\theta}_2)$=`r round(sd(mc2),5)`.
+
+Se temos 2 estimadores, $θ_1$ e  $θ_2$, e $V(θ_2)<V(θ_1)$, então o percentual de redução de variância é:
+
+$$ 100 (\frac{V(\widehat{\theta}_1)-V(\widehat{\theta}_2)} {V(\widehat{\theta}_1)})\%$$
+
+Portanto, temos que o percentual de redução de variância será de `r round(100*(var(mc1)-var(mc2))/var(mc1), 2)`% :
+
+```{r}
+round(100*(var(mc1)-var(mc2))/var(mc1), 2)
+```
+
+
+
 # Exercício 10
 ***
+
+A questão pede que estimemos a esperança de $X^2$ de uma distribuição normal padrão definida no intervalo $[1,\infty)$ pelo método da amostragem por importância.
+A esperança a ser estimada é descrita a seguir:
+
+$$
+E(X^2) = \int_{1}^{\infty} \frac{{x^2}}{\sqrt{2\pi}}exp \left( \frac{-x^2}{2} \right) 
+$$
+Uma distribuição interessante para ser utilizada é a distribuição normal padrão truncada em 1, porque possui o mesmo suporte que a densidade que temos $[0,\infty)$ e, além disso, a razão entre ambas gera uma expressão estável. A estabilidade se dá pela semelhança entre a distribuição normal que a questão oferece e a distribuição normal truncada. 
+
+A razão referida anteriormente pode ser definida, com alguma simplificação de notação, da seguinte maneira: 
+
+$$
+R = \frac{g(x)}{f(x)},
+$$
+onde $g(x)$ denota a distribuição original, no caso a distribuição normal padrão pré multiplicada por $x^2$ e $f(X)$ a função de importância. É importante observar que a variância do estimador depende de $R$, logo é aconselhável obter razões $R$ mais estáveis.
+
+A implementação do algoritmo de importância segue abaixo:
+
+```{r}
+MCNormTruncX2 <- function(n,lower=1,upper=Inf,media=0,dp=1){
+# verificando se o pacote truncnorm precisa ser instalado
+if("truncnorm" %in% rownames(installed.packages())==FALSE)
+{install.packages("truncnorm");library(truncnorm)}
+  else library(truncnorm)
+  
+rtn      <- rtruncnorm(n=n,a=lower,b=upper,mean=media,sd=dp)
+int1     <- ((rtn^2)*dnorm(x=rtn,mean=media,sd=dp))/dtruncnorm(x=rtn,
+        a=lower,b=upper,mean=media,sd=dp)
+impMC1   <- mean(int1)
+varinf1  <- var(int1)/n
+
+result   <- list(thetahat = impMC1,
+                 varhat   = varinf1)
+return(result)
+}
+cbind(rbind(MCNormTruncX2(n=100),MCNormTruncX2(n=1e4),MCNormTruncX2(n=1e6)),c(100,1e4,1e6))
+```
+
+Note que os valores de truncagem estão pré definidos, mas nada impede que os valores de $lower$ e $upper$ sejam substituidos. O mesmo ocorre com os valores da média e do desvio-padrão. Note também que os resultados indicam que o estimador é consistente, pois à medida que se eleva $n$, a variância do estimador reduz consideravelmente.
+
+
 
 ***
 ***
