@@ -17,7 +17,7 @@ Divisão das questões:
 * *Questão 6*: Guedes & Henrique ( X )
 * *Questão 7*: Heidi & Elainy ( X )
 * *Questão 8*: Cindy & Katherine ( X )
-* *Questão 9*: Nicolas & Thaís ( _ )
+* *Questão 9*: Nicolas & Thaís ( X )
 * *Questão 10*: Rodney & Mario ( X )
 
 ***
