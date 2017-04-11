@@ -1,23 +1,57 @@
 ---
-title: "Exercicio 4"
-author: "Ricardo de Faria Souza"
+title: "Questão 4 - 1 Lista"
+author: "Pedro e Ricardo"
 date: "8 de abril de 2017"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Resolução do Algoritmo
+**4) Seja $X$ uma variável aleatória não-negativa com $\mu = E(X) < \infty$. Para uma amostra aleatória $x_1, x_2, \ldots, _n$ da distribuição X, a razão de gini é: **
 
-* Elaborração do algoritimo para a Razão de gini;
-* Estimar $\mu$ por simulação e obtendo $\bar{X}$ de cada amostra gerada das dist. $logN(0,1), U(0,1) e Bin(1,0.5)$; 
-* Gerar $10^6$ variáveis da distribuicões citadas acima e ordena-las em ordem crescente;
-* Cada distribuição recebeu um índice que identifica qual esta sendo usada na fução: 1= logNormal, 2=Uniforme e 3=Binomial, para que a função escolha a função desejada;
+$$G = \dfrac{1}{2n^2}\sum_{j=1}^{n}\sum_{i =1}^{n}|x_i - x_j|.$$
+
+**Esta quantidade é utilizada em Economia para medir a desigualdade na distribuição de renda. Observe  também que $G$ pode ser reescrito como função das estatísticas de ordem:**
+
+$$G = \dfrac{1}{n^2\mu}\sum_{i=1}^{n}(2i - n -1)x_{(i)}.$$
+
+**Se a média é desconhecida, considere $\hat G$ como a estatística $G$, na qual subistitui-se $\mu$ por $\bar X$. Estime por simulação a média, a mediana e os decis(quantis 0,10,...,80,90,100) de $\hat G$, quanto $X$ tem: **
 
 
-```{r estimador}
+\begin{itemize}
+\item[a.] Distribuição lognormal;
+\item[b.] Distribuição Uniforme;
+\item[c.] Distribuição Bernoulli(0,1).
+\end{itemize}
+
+**Escolha os parâmetros das distribuições log-normal e uniforme conforme achar adequado.**
+
+
+## Resposta
+Nosso interesse é estimar $\mu = E(X)$ através de simulação considerando $3$ distribuições como referência:
+
+\begin{itemize}
+\item[a.] $X \sim lognormal(0,1)$;
+\item[b.] $X \sim Uniforme(0,1)$;
+\item[c.] $X \sim Binomial(1,0,1)$.
+\end{itemize}
+
+O algoritmo é o seguinte:
+\begin{itemize}
+\item[1] Gerar $10^6$ valores da distribuição;
+\item[2] Ordena estes valores;
+\item[3] Substitui os valores ordenados na função $G$.
+\item[4] Calcula-se a média;
+\item[5] Repete este processo $n$ vezes;
+\item[6] Calcula-se a média das médias.
+\end{itemize}
+
+
+ Seja a função gini abaixo com parâmetros n e dist, em que dist corresponde a qual função de refêrencia será usada, 1= logNormal, 2=Uniforme e 3=Binomial.
+```{r, include = TRUE}
+
 gini=function(n,dist){
   if ((dist< 1) | (dist >3)) stop("Valor interios deve estar entre 1 e 3!")
   {gi=vector("numeric", n);
@@ -40,28 +74,48 @@ gini=function(n,dist){
   return(ki/(n^2*xb))
 }
 ```
-* As estimativas da quantidade de Gini para cada distribuição da variável aleatória são:
 
-```{r gini}
-gin1=replicate(100, gini(1000,1)) #Lognormal
-gin2=replicate(100, gini(1000,2)) #Uniforme
-gin3=replicate(100, gini(1000,3)) #Binomial
-```
+Dado a função acima, podemos agora calcula a estimativa da média, mediana e os decis(quantis 0,10,...,80,90,100) de $\hat G$. 
 
-* A estimativa da média, mediana e os decis da estatística de G gini para a amostra aleatória $x_{1},...,x_{n}$ da variável $X$ ultilizando as distribuiçoes é da seguinte forma:
+\begin{itemize}
+\item Seja $X \sim Lognormal(0,1)$
+\end{itemize}
 
+A estimativa da média de $G$ vai ser dado por $E(X) = `r mean(replicate(1000, gini(10000,1)))`$. A estimativa da mediada é igual a `r median(replicate(1000,gini(10000,1)))` e os quantis são dados por:
 
-```{r estimativas}
-xbar1=mean(gin1) 
-xbar2=mean(gin2) 
-xbar3=mean(gin3) 
-md1=median(gin1)
-md2=median(gin2)
-md3=median(gin3)
-qt1=quantile(gin1,seq(0,1,0.1))
-qt2=quantile(gin2,seq(0,1,0.1))
-qt3=quantile(gin3,seq(0,1,0.1))
+```{r, include= TRUE}
+decis <- matrix(round(quantile(replicate(1000, gini(1000,1)),seq(0,1,0.1)), 2), ncol = 11 )
+colnames(decis) = c("  0%"  , "10%"   ,"20%",   "30%",   "40%",   "50%",
+                    "60%",   "70%",   "80%", "90%",  "100%" )
+rownames(decis) = c("Estimativas")
+decis
 ```
 
 
-$\textit{"A vida e feita de oportunidades, e o mais importante talvez nao seja saber somente aproveita-las mas tambem cria-las...."}$
+\begin{itemize}
+\item Seja $X \sim Uniforme(0,1)$
+\end{itemize}
+
+A estimativa da média de $G$ vai ser dado por $E(X) = `r mean(replicate(1000, gini(10000,2)))`$. A estimativa da mediada é igual a `r median(replicate(1000,gini(10000,2)))` e os quantis são dados por:
+
+```{r, include= TRUE}
+decis <- matrix(round(quantile(replicate(1000, gini(1000,2)),seq(0,1,0.1)), 2), ncol = 11 )
+colnames(decis) = c("  0%"  , "10%"   ,"20%",   "30%",   "40%",   "50%", 
+                    "60%",   "70%",   "80%", "90%",  "100%" )
+rownames(decis) = c("Estimativas")
+decis
+```
+
+\begin{itemize}
+\item Seja $X \sim Binomial(1,0.1)$
+\end{itemize}
+
+A estimativa da média de $G$ vai ser dado por $E(X) = `r mean(replicate(1000, gini(10000,3)))`$. A estimativa da mediada é igual a `r median(replicate(1000,gini(10000,3)))` e os quantis são dados por:
+
+```{r, include= TRUE}
+decis <- matrix(round(quantile(replicate(1000, gini(10000,3)),seq(0,1,0.1)), 2), ncol = 11 )
+colnames(decis) = c("  0%"  , "10%"   ,"20%",   "30%",   "40%",   "50%",
+                    "60%",   "70%",   "80%", "90%",  "100%" )
+rownames(decis) = c("Estimativas")
+decis
+```
