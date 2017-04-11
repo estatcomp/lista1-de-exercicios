@@ -322,35 +322,32 @@ $$
 ```{r estimador}
 gini=function(n,dist){
   if ((dist< 1) | (dist >3)) stop("Valor interios deve estar entre 1 e 3!")
-  ki=NULL
-  gi=NULL
-  m=dist
-  if(m==1){
-  xb=mean(rlnorm(100,0,1))  
-  u=c(sort(rlnorm(n,0,1)))
+  {gi=vector("numeric", n);
+  if(dist==1){
+    u=sort(rlnorm(n,0,1));
+    xb=mean(u);
   } else 
-      if (m==2){
-        xb=mean(runif(100,0,1))  
-        u=c(sort(runif(n,0,1)))
-      } else 
-        if (m==3){
-          xb=mean(rbinom(100,1,0.5))  
-          u=c(sort(rbinom(n,1,0.5)))
-        } 
-      for(i in 1:n){
-        ki=c(ki,(2*i-n-1)*u[i]) 
-        gi=c(gi,sum(ki)/(n^2*xb))
-      }
-  return(gi)
+    {if (dist==2){
+      u=sort(runif(n,0,1))
+      xb=mean(u)  
+    }else 
+      {if (dist==3){
+        u=sort(rbinom(n,1,0.1))
+        xb=mean(u)  
+      }}}} 
+  ki=0;
+  for(i in 1:n){
+    ki = ki + (2*i-n-1)*u[i];
+  }
+  return(ki/(n^2*xb))
 }
-
 ```
 * As estimativas da quantidade de Gini para cada distribuição da variável aleatória são:
 
 ```{r gini}
-gin1=gini(1000,1) #Lognormal
-gin2=gini(1000,2) #Uniforme
-gin3=gini(1000,3) #Binomial
+gin1=replicate(100, gini(1000,1)) #Lognormal
+gin2=replicate(100, gini(1000,2)) #Uniforme
+gin3=replicate(100, gini(1000,3)) #Binomial
 
 ```
 
