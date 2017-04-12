@@ -30,25 +30,25 @@ options(width=100)
 # Exercício 1
 ***
 
+**A distribuição de Pareto ($\alpha,\beta$) tem a seguinte 
+distribuição**
 
+\[ F(x) = 1-(\beta /x)^\alpha \]
 
+**Expressão na qual x >=b, a>0. Apresente um algorítimo para geração de
+  variáveis aleatórias para esta distribuição. Usando R, simule uma
+  amostra para Pareto(2,2). Apresente o histograma da amostra combinado
+  com a densidade teórica da mesma para comparação.**
 
+**Solução:**
 
-Questão 1 - A distribuição de Pareto ($\alpha,\beta$) tem a seguinte distribuição
+O algorítimo para geração de variáveis aleatórias para esta
+distribuição se baseia na geração de variáveis aleatórias pelo método 
+da inversão.
 
-
-
-$$ F(x) = 1-(\beta /x)^\alpha $$
-
-Expressão na qual x >=b, a>0. Apresente um algorítimo para geração de variáveis aleatórias para esta distribuição. Usando R, simule uma amostra para Pareto(2,2). Apresente o histograma da amostra combinado com a densidade teórica da mesma para comparação.
-
-
-
-**Resposta**
-
-O algorítimo para geração de variáveis aleatórias para esta distribuição se baseia na geração de variáveis aleatórias pelo método da inversão.
-
-Segundo o teorema da Probabilidade da Transformação Integral (Rizzo,2008), se X é uma variável aleatória continua com distribuição $F_x (x)$, então U = $F_x (x)$ ~ U (0,1).
+Segundo o teorema da Probabilidade da Transformação Integral
+(Rizzo,2008), se X é uma variável aleatória continua com distribuição 
+$F_x (x)$, então U = $F_x (x)$ ~ U (0,1).
 
 Assim, 
 
@@ -60,12 +60,10 @@ Calculando a inversa de F(x), temos que $F_x^{-1}(u)$ é descrita por:
 $$x =b/(1-u)^{1/a}$$ 
 
 
-O algorítimo para geração de um conjunto de valores aleatórios uniformes, então,
+O algorítimo para geração de um conjunto de valores aleatórios 
+uniformes, então,
 
 ```{r}
-
-
-
 func.inver <- function(a,b,Nsimu = 1e6){
 # Difine intervalos (a,b) e gera Nsimu variáveis
 
@@ -78,18 +76,15 @@ func.inver <- function(a,b,Nsimu = 1e6){
   return(gx)
   
 }
-
 ```
 
-A partir desta função, gerou-se um número grande variáveis aleatórias (u), e substituiu-se na função inversa:
+A partir desta função, gerou-se um número grande variáveis aleatórias 
+(u), e substituiu-se na função inversa:
 
 ```{r}
-
 set.seed(42017)
 X = func.inver(2,2)
-
 ```
-
 
 O histograma desta função, com os parâmetros dados, temos:
 
@@ -97,20 +92,23 @@ O histograma desta função, com os parâmetros dados, temos:
 hist(X)
 ```
 
-Como a Pareto é uma distribuição para valores extremos, visualizações de toda a amostra gerada por um histograma não é muito informativa, pois a maior observação chega a ter valor `r max(X)`. Teoricamente, quando `x = 20`, temos que $F(20) = 0.99$. De fato, nas `1e6` variáveis geradas, `r as.numeric(table(X>20)[2]/1e6)*100`% são maiores que $20$.
-Assim, vamos representar o histograma até o valor `x=20` para que possamos ter uma melhor visualização dos dados.
+Como a Pareto é uma distribuição para valores extremos, visualizações 
+de toda a amostra gerada por um histograma não é muito informativa, 
+pois a maior observação chega a ter valor `r max(X)`. Teoricamente, 
+quando `x = 20`, temos que $F(20) = 0.99$. De fato, nas `1e6` variáveis
+geradas, `r as.numeric(table(X>20)[2]/1e6)*100`% são maiores que $20$.
+Assim, vamos representar o histograma até o valor `x=20` para que 
+possamos ter uma melhor visualização dos dados.
 
 Em seguida, define-se a densidade de Pareto
 
 ```{r}
   # Densidade da Pareto(2,2)
   dpareto=function(x, a=2, b=2) a*b^a/x^(a+1)
-
 ```
 
-
-Por fim, comparando-se o histograma das duas distribuições, a teórica e a estimada, temos:
-
+Por fim, comparando-se o histograma das duas distribuições, a teórica e
+a estimada, temos:
 
 ```{r}
 # Histograma das variáveis geradas
@@ -119,48 +117,89 @@ hist(subset(X, X <= 20))
 lines(2:20, dpareto(2:20)*1e6, col = "red")
 ```
 
-
-
 # Exercício 2
 ***
-Questão 2:
 
-Geramos amostras de uma distribuição de interesse a partir da geração de de uma distribuição conhecida e então, rejeitando um subconjunto gerado. O mecanismo de rejeição é construído de forma que, a amostra que será aceita segue a distribuição de interesse.
-Queremos gerar valores aleatórios de uma densidade de probabilidade $f$ definida em um algum conjunto $X$.
- Seja $g$ uma densidade em $X$ a partir da qual sabemos gerar valores aleatórios e com a propriedade de que
+**Prove que variáveis aleatórias geradas pelo método de 
+  aceitação-rejeição são, de fato, uma amostra aleatória da
+  densidade-alvo \(f_{X}\).**
+
+**Solução:**
+
+Geramos amostras de uma distribuição de interesse a partir da geração
+de uma distribuição conhecida e então, rejeitando um subconjunto 
+gerado. O mecanismo de rejeição é construído de forma que, a amostra
+que será aceita segue a distribuição de interesse. Queremos gerar
+valores aleatórios de uma densidade de probabilidade $f$ definida em
+um algum conjunto $X$. Seja $g$ uma densidade em $X$ a partir da qual
+sabemos gerar valores aleatórios e com a propriedade de que
 $f(X) < c*g(X)$, para todo $x \in X$ e alguma constante $c$.
 
-Geramos um elemento $x$ a partir da densidade $g$ e aceitamos o elemento com probabilidade $f(x)/cg(X)$, ou seja,
+Geramos um elemento $x$ a partir da densidade $g$ e aceitamos o
+elemento com probabilidade $f(x)/cg(X)$, ou seja,
+
 $$
 P(\text{Aceitar}|Y) = P\left(U < \frac{f(Y)}{cg(Y)}|Y\right) = \frac{f(Y)}{cg(Y)}.
 $$
-Note ainda que a probabilidade total de aceitar $Y$ pode ser calculada da seguinte maneira:
+
+Note ainda que a probabilidade total de aceitar $Y$ pode ser calculada 
+da seguinte maneira:
+
 $$
 \sum_{n}P(\text{Aceitar}|y)P(Y=y)=\sum_{n}\frac{f(y)}{cg(y)}g(y)=\frac{1}{c}.
 $$
-Agora possuimos todos os elementos para mostrar, pelo menos no caso discreto, que o método de aceitação e rejeição gera, de fato, números aleatórios da distribuição de interesse. Para a prova utilizamos o teorema de Bayes.
 
-Suponha um $k$ qualquer de modo que $f(k)>0$, então pelo teorema de Bayes temos que: 
+Agora possuimos todos os elementos para mostrar, pelo menos no caso 
+discreto, que o método de aceitação e rejeição gera, de fato, números 
+aleatórios da distribuição de interesse. Para a prova utilizamos o 
+teorema de Bayes.
+
+Suponha um $k$ qualquer de modo que $f(k)>0$, então pelo teorema de 
+Bayes temos que: 
+
 $$
 P(k|\text{Aceitar})=\frac{P(\text{Aceitar}|k)g(k)}{P(\text{Aceitar})} = \frac{[f(k)/(cg(k))]g(k)]}{1/c} = f(k)
 $$
 
-Este método pode ser implementado ao gerar um elemento $u$ distribuido uniformemente em (0,1) e então, aceitamos se $u < f(x)/cg(x)$. 
-Se $x$ é rejeitado, um novo candidato é amostrado de $g$ e repetimos o teste de aceitação. 
-O processo se repete até que o teste de aceitação gere a quantidade desejada de números aleatórios; os valores aceitos são elementos com distribuição $f$.
+Este método pode ser implementado ao gerar um elemento $u$ distribuido 
+uniformemente em (0,1) e então, aceitamos se $u < f(x)/cg(x)$. 
+Se $x$ é rejeitado, um novo candidato é amostrado de $g$ e repetimos o 
+teste de aceitação. 
+O processo se repete até que o teste de aceitação gere a quantidade 
+desejada de números aleatórios; os valores aceitos são elementos com 
+distribuição $f$.
 
 Algoritmo
+
 O algoritmo do método de aceitação-rejeição pode ser apresentado nos passos abaixo.
-\begin{enumerate}
-\item{Simula-se o valor $x$ com densidade $g$ }
-\item{Gera-se um número aleatório $u \sim \text{Unif}(0,1)$}
-\item{Se $u < f(x)/cg(x)$, aceita-se o valor e para. Caso contrário, retorna-se ao passo 1.}
-\end{enumerate}
+
+1. Simula-se o valor $x$ com densidade $g$ }
+
+2. Gera-se um número aleatório $u \sim \text{Unif}(0,1)$}
+
+3. Se $u < f(x)/cg(x)$, aceita-se o valor e para. Caso contrário, 
+   retorna-se ao passo 1.
 
 # Exercício 3
 ***
 
-No código a seguir, simulamos uma amostra da variável Epanechnikov usando o algoritmo descrito na questão e, em seguida, construimos um histograma das variáveis geradas. 
+**O núcleo escalonado de Epanechnikov é**
+
+\[ f_{e}(x) = \frac{3}{4} (1 - x{2}),\quad |x| < 1. \]
+
+**Uma proposta de geração de varáveis aleatórias para este caso é:**
+
+a. \(U_{1}, U_{2}, u_{3} \sim U(-1, 1)\)
+
+b. **Se** \(|U_{3}| > |U_{2}|\) **e** \(|U_{3}| > |U_{1}|\), 
+   **retorne** \(U_{2}\). **Caso contrário, retorne** \(U_{3}\).
+
+**Solução:**
+
+No código a seguir, simulamos uma amostra da variável Epanechnikov 
+usando o algoritmo descrito na questão e, em seguida, construimos um 
+histograma das variáveis geradas. 
+
 ```{r}
 # densidade Epanechnikov
 d_epach = function(x) 3*(1 - x^2)/4
@@ -179,119 +218,192 @@ r_epach = function(n){
 }
 
 # histograma de uma amostra da Epanechnikov e a densidade verdadeira
-hist(r_epach(100000),prob=TRUE,main="Histograma - núcleo de Epanechnikov",
+hist(r_epach(100000),prob=TRUE,
+     main="Histograma - núcleo de Epanechnikov",
      ylim=c(0,1),ylab="Densidade",xlab="")
 curve(d_epach, xlim=c(-1,1),add=TRUE,col=2,lwd=2)
 ```
 
-Comparando o histograma com a densidade Epanechnikov, vemos que os valores simulados estão bastante próximos da densidade teórica.
+Comparando o histograma com a densidade Epanechnikov, vemos que os 
+valores simulados estão bastante próximos da densidade teórica.
 
-Nessa parte vamos provar que o algoritmo de fato gera valores da densidade Epanechnikov, primeiro utilizamos integrais para encontrar a função de distribuição desejada e verificamos que o algoritmo é adequado. Depois resolvemos de outro método, utilizando estatística de ordem para facilitar a resolução . 
+Nessa parte vamos provar que o algoritmo de fato gera valores da 
+densidade Epanechnikov, primeiro utilizamos integrais para encontrar a 
+função de distribuição desejada e verificamos que o algoritmo é 
+adequado. Depois resolvemos de outro método, utilizando estatística de 
+ordem para facilitar a resolução . 
 
 1º Método
 
-Sabemos que $U_i \sim U(-1,1)$, $i\in\{1,2,3\}$, daí a função de distribuição de $U_i$ é 
+Sabemos que $U_i \sim U(-1,1)$, $i\in\{1,2,3\}$, daí a função de 
+distribuição de $U_i$ é 
+
 $$
 F_U(u) = \frac{u+1}{2},
 $$
+
 então, para $Y_i = |U_i|$ temos que
+
 $$
 F_{Y_i}(y) = P(|U_i| \leq y) = P(-y \leq U_i \leq y) = F_{U_i}(y) - F_{U_i}(-y) = \left(\frac{y+1}{2}\right) - \left(\frac{-y+1}{2}\right) = y,
 $$
+
 ou seja, $Y_i \sim U(0,1)$, $i\in\{1,2,3\}$.
 
-Sendo $X$ a variável aleatória gerada de acordo com o algoritmo descrito na questão, temos que
+Sendo $X$ a variável aleatória gerada de acordo com o algoritmo 
+descrito na questão, temos que
+
 $$
 X = \left\{\begin{array}{cc}
 U_2 & \textrm{se } |U_3|>max\{|U_1|,|U_2|\}\\
 U_3 & \textrm{se } |U_3|\leq max\{|U_1|,|U_2|\}\\
 \end{array}\right.,
 $$
-e como $U_2$ e $U_3$ são simétricas em torno de zero, pelo algoritmo temos que $X$ também o será. Logo, $P(X<0) = 1/2$. Considerando então $0<x<1$, temos que
+
+e como $U_2$ e $U_3$ são simétricas em torno de zero, pelo algoritmo 
+temos que $X$ também o será. Logo, $P(X<0) = 1/2$. Considerando então 
+$0<x<1$, temos que
+
 \begin{align*}
-P(|X|\leq x) &= P(|U_3|>max\{|U_1|,|U_2|\},|U_2|\leq x) + P(|U_3| \leq max\{|U_1|,|U_2|\},|U_3|\leq x)\\
-&= P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) + P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x).
+P(|X|\leq x) &= P(|U_3|>max\{|U_1|,|U_2|\},|U_2|\leq x) + P(|U_3| \leq
+max\{|U_1|,|U_2|\},|U_3|\leq x)\\
+
+&= P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) + P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq 
+x).
 \end{align*}
 
-Sabemos que a densidade de $Y_i$ é $f_{Y_i}(y) = 1$ para $0<y<1$. Assim, calculando a primeira probabilidade temos que
+Sabemos que a densidade de $Y_i$ é $f_{Y_i}(y) = 1$ para $0<y<1$. 
+Assim, calculando a primeira probabilidade temos que
+
 \begin{align*}
-P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) &= P(Y_1\leq Y_2 \leq Y_3, Y_2\leq x) + P(Y_2\leq Y_2 \leq Y_3, Y_2\leq x)\\\
-&= \int_{0}^{x}\int_{0}^{y_2}\int_{y_2}^{1}dy_3dy_1dy_2 + \int_{0}^{x}\int_{y_2}^{1}\int_{y_1}^{1}dy_3dy_1dy_2\\
-&= \int_{0}^{x}\int_{0}^{y_2}(1-y_2)dy_1dy_2 + \int_{0}^{x}\int_{y_2}^{1}(1-y_1)dy_1dy_2\\
-&= \int_{0}^{x}(1-y_2)y_2dy_1dy_2 + \int_{0}^{x}\left[\left.(y_1-\frac{y_1^2}{2})\right|_{y_2}^{1}\right]dy_2\\
-&= \left.\left(\frac{y_2^2}{2}-\frac{y_2^3}{3}\right)\right|_0^x + \int_{0}^{x}\left[1 - \frac{1}{2} - y_2 + \frac{y_2^2}{2} \right]dy_2\\
-&= \frac{x^2}{2}-\frac{x^3}{3} + \left.\left[\frac{y_2}{2} - \frac{y_2^2}{2} + \frac{y_2^3}{6} \right]\right|_0^x\\
-&= \frac{x^2}{2}-\frac{x^3}{3} + \frac{x}{2}-\frac{x^2}{2} + \frac{x^3}{6} = \frac{x}{2} - \frac{x^3}{6}\\
+P(Y_3>max\{Y_1,Y_2\},Y_2\leq x) &= P(Y_1\leq Y_2 \leq Y_3, Y_2\leq x) +
+P(Y_2\leq Y_2 \leq Y_3, Y_2\leq x)\\\
+&= \int_{0}^{x}\int_{0}^{y_2}\int_{y_2}^{1}dy_3dy_1dy_2 + 
+\int_{0}^{x}\int_{y_2}^{1}\int_{y_1}^{1}dy_3dy_1dy_2\\
+&= \int_{0}^{x}\int_{0}^{y_2}(1-y_2)dy_1dy_2 + 
+\int_{0}^{x}\int_{y_2}^{1}(1-y_1)dy_1dy_2\\
+&= \int_{0}^{x}(1-y_2)y_2dy_1dy_2 + 
+\int_{0}^{x}\left[\left.(y_1-\frac{y_1^2}{2})\right|_{y_2}^{1}\right]
+dy_2\\
+&= \left.\left(\frac{y_2^2}{2}-\frac{y_2^3}{3}\right)\right|_0^x + 
+\int_{0}^{x}\left[1 - \frac{1}{2} - y_2 + \frac{y_2^2}{2} \right]dy_2\\
+&= \frac{x^2}{2}-\frac{x^3}{3} + \left.\left[\frac{y_2}{2} - 
+\frac{y_2^2}{2} + \frac{y_2^3}{6} \right]\right|_0^x\\
+&= \frac{x^2}{2}-\frac{x^3}{3} + \frac{x}{2}-\frac{x^2}{2} + 
+\frac{x^3}{6} = \frac{x}{2} - \frac{x^3}{6}\\
 \end{align*}
 
 Na segunda probabilidade, temos que
+
 \begin{align*}
-P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= P(Y_3\leq Y_2 \leq Y_1, Y_3\leq x) + P(Y_2\leq Y_3 \leq Y_1, Y_3\leq x) \\
-&+ P(Y_3\leq Y_1 \leq Y_2, Y_3\leq x) + P(Y_1\leq Y_3 \leq Y_2, Y_3\leq x)\\
-&= 2[P(Y_3\leq Y_2 \leq Y_1, Y_3\leq x) + P(Y_2\leq Y_3 \leq Y_1, Y_3\leq x)],
+P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= P(Y_3\leq Y_2 \leq Y_1, Y_3\leq
+x) + P(Y_2\leq Y_3 \leq Y_1, Y_3\leq x) \\
+&+ P(Y_3\leq Y_1 \leq Y_2, Y_3\leq x) + P(Y_1\leq Y_3 \leq Y_2, Y_3\leq
+x)\\
+&= 2[P(Y_3\leq Y_2 \leq Y_1, Y_3\leq x) + P(Y_2\leq Y_3 \leq Y_1, 
+Y_3\leq x)],
 \end{align*}
-onde na primeira igualdade listamos as possíveis formas que o evento $[Y_3>max\{Y_1,Y_2\},Y_3\leq x]$ pode ocorrer e na segunda igualdade usamos o fato de $Y_1$ e $Y_2$ serem identicamente distribuídas. Daí
+
+onde na primeira igualdade listamos as possíveis formas que o evento 
+$[Y_3>max\{Y_1,Y_2\},Y_3\leq x]$ pode ocorrer e na segunda igualdade 
+usamos o fato de $Y_1$ e $Y_2$ serem identicamente distribuídas. Daí
+
 \begin{align*}
-P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= 2\left[ \int_{0}^{x}\int_{y_3}^{1}\int_{y_2}^{1}dy_1dy_2dy_3 + \int_{0}^{x}\int_{0}^{y_3}\int_{y_3}^{1}dy_1dy_2dy_3 \right]\\
-&= 2\left[ \int_{0}^{x}\int_{y_3}^{1}(1-y_2)dy_2dy_3 + \int_{0}^{x}\int_{0}^{y_3}(1-y_3)dy_2dy_3 \right]\\
-&= 2\left[ \int_{0}^{x}\left[\left.(y_2-\frac{y_2^2}{2})\right|_{y_3}^{1}\right]dy_3 + \int_{0}^{x}(1-y_3)y_3dy_3 \right]\\
-&= 2\left[ \int_{0}^{x}\left[\frac{1}{2} - y_3 + \frac{y_3^2}{2}\right]dy_3 + \left.\left(\frac{y_3^2}{2}-\frac{y_3^3}{3}\right)\right|_0^x \right]\\
-&= 2\left[ \left.\left[\frac{y_3}{2} - \frac{y_3^2}{2} + \frac{y_3^3}{6} \right]\right|_0^x + \frac{x^2}{2}-\frac{x^3}{3} \right]\\
-&= 2\left[ \frac{x}{2} - \frac{x^2}{2} + \frac{x^3}{6} + \frac{x^2}{2}-\frac{x^3}{3} \right] = x - \frac{x^3}{3}\\
+P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= 2\left[ 
+\int_{0}^{x}\int_{y_3}^{1}\int_{y_2}^{1}dy_1dy_2dy_3 + 
+\int_{0}^{x}\int_{0}^{y_3}\int_{y_3}^{1}dy_1dy_2dy_3 \right]\\
+&= 2\left[ \int_{0}^{x}\int_{y_3}^{1}(1-y_2)dy_2dy_3 + 
+\int_{0}^{x}\int_{0}^{y_3}(1-y_3)dy_2dy_3 \right]\\
+&= 2\left[
+\int_{0}^{x}\left[\left.(y_2-\frac{y_2^2}{2})\right|_{y_3}^{1}\right]
+dy_3 + \int_{0}^{x}(1-y_3)y_3dy_3 \right]\\
+&= 2\left[ \int_{0}^{x}\left[\frac{1}{2} - y_3 + 
+\frac{y_3^2}{2}\right]dy_3 + 
+\left.\left(\frac{y_3^2}{2}-\frac{y_3^3}{3}\right)\right|_0^x \right]\\
+&= 2\left[ \left.\left[\frac{y_3}{2} - \frac{y_3^2}{2} + 
+\frac{y_3^3}{6} \right]\right|_0^x + \frac{x^2}{2}-\frac{x^3}{3} 
+\right]\\
+&= 2\left[ \frac{x}{2} - \frac{x^2}{2} + \frac{x^3}{6} + 
+\frac{x^2}{2}-\frac{x^3}{3} \right] = x - \frac{x^3}{3}\\
 \end{align*}
 
 Portanto,
+
 $$
-P(|X|\leq x) = \frac{x}{2} - \frac{x^3}{6} + x - \frac{x^3}{3} = \frac{3x}{2} - \frac{3x^3}{6} = \frac{3x - x^3}{2},
+P(|X|\leq x) = \frac{x}{2} - \frac{x^3}{6} + x - \frac{x^3}{3} = 
+\frac{3x}{2} - \frac{3x^3}{6} = \frac{3x - x^3}{2},
 $$
 e pela simetria de $X$, temos que 
+
 $$
-P(X\leq x) = P(X\leq 0) + P(0<X\leq x) = \frac{1}{2} + \frac{P(|X|\leq x)}{2} = \frac{1}{2} + \frac{3x - x^3}{4},
+P(X\leq x) = P(X\leq 0) + P(0<X\leq x) = \frac{1}{2} + \frac{P(|X|\leq 
+x)}{2} = \frac{1}{2} + \frac{3x - x^3}{4},
 $$
-onde $0<x<1$. Novamente usando o fato da distribuição de $X$ ser simétrica, temos para $0<x<1$ que
+
+onde $0<x<1$. Novamente usando o fato da distribuição de $X$ ser 
+simétrica, temos para $0<x<1$ que
+
 $$
-F_X(-x) = 1 - F_X(x) = 1 - \left[ \frac{1}{2} + \frac{3x - x^3}{4} \right] 
+F_X(-x) = 1 - F_X(x) = 1 - \left[ \frac{1}{2} + \frac{3x - x^3}{4} 
+\right] 
 = \frac{1}{2} - \frac{(3x - x^3)}{4} 
 = \frac{1}{2} + \frac{3(-x) - (-x)^3}{4},
 $$
-ou seja, a função de distribuição de $X$ é $F_X(x) = 1/2 + (3x - x^3)/4$, para $x\in[-1,1]$, e derivando $F_X(x)$ em relação a $x$ obtemos a função densidade de $X$, que é
+
+ou seja, a função de distribuição de $X$ é
+$F_X(x) = 1/2 + (3x - x^3)/4$, para $x\in[-1,1]$, e derivando $F_X(x)$ 
+em relação a $x$ obtemos a função densidade de $X$, que é
+
 $$
 f_X(x) = \frac{3(1-x^2)}{4}, \quad -1\leq x \leq 1,
 $$
-assim, vemos que $X$ tem distribuição Epanechnikov, e o método de geração está correto.
+
+assim, vemos que $X$ tem distribuição Epanechnikov, e o método de 
+geração está correto.
 
 2º Método
 
-Note que o algoritmo proposto pode ser encarado como uma mistura de distribuições das estatísticas de ordem 1 e 2 para três uniformes com parametrização $(0,1)$.
+Note que o algoritmo proposto pode ser encarado como uma mistura de 
+distribuições das estatísticas de ordem 1 e 2 para três uniformes com 
+parametrização $(0,1)$.
 
-Portanto, é razoável afirmar que a distribuição desejada pode ser obtida da seguinte forma:
+Portanto, é razoável afirmar que a distribuição desejada pode ser 
+obtida da seguinte forma:
 
 \begin{equation}\label{eq:estordem}
 f^{\ast}(u)=\frac{1}{2}f_{(1)}(u)+\frac{1}{2}f_{(2)}(u).
 \end{equation}
-Note que está é uma afirmação, que será provada verdadeira caso a distribuição obtida seja, de fato, a que buscamos
+Note que está é uma afirmação, que será provada verdadeira caso a 
+distribuição obtida seja, de fato, a que buscamos
 
-Sabemos que a distribuição genérica de uma estatística de ordem qualquer é dada da seguinte maneira
+Sabemos que a distribuição genérica de uma estatística de ordem 
+qualquer é dada da seguinte maneira
 
 $$
-f_{(k)}(x) = \frac{n!}{(k-1)!(n-k)!} \left[F_{X}(x)\right]^{k-1} \left[1-F_{X}(x)\right]^{n-k}f_{X}(x)
+f_{(k)}(x) = \frac{n!}{(k-1)!(n-k)!} \left[F_{X}(x)\right]^{k-1} 
+\left[1-F_{X}(x)\right]^{n-k}f_{X}(x)
 $$
+
 Adaptando para o nosso caso temos que:
 
 $$
 f_{(1)}(u)=3(1-u)^{2}
 $$
+
 e
 
 $$
 f_{(2)}(u)=3u(1-u),
 $$
+
 isso porque para uma distribuição uniforme (0,1),
 
 $$
 F_{X}=\frac{x-a}{b-a}=x
 $$
+
 e
+
 $$
 f_{X}=\frac{1}{b-a}=1
 $$
@@ -299,27 +411,70 @@ $$
 Substituindo $f_{(1)}$ e $f_{(2)}$ na equação \eqref{eq:estordem} temos que:
 
 \begin{equation}\label{eq:densepac}
-f^{\ast}(u)=\frac{3}{2}(1-u)^{2} + \frac{3}{2}u(1-u) = \frac{3}{2}\left(1-u^2\right), u<1
+f^{\ast}(u)=\frac{3}{2}(1-u)^{2} + \frac{3}{2}u(1-u) = 
+\frac{3}{2}\left(1-u^2\right), u<1
 \end{equation}
 
-Observe que $u$ na equação acima está definida apenas para $u<1$, mas pela simetria da distribuição podemos dividir a equação \eqref{eq:densepac} por 2 para obter a função de distribuição no domínio desejado, que é $|u|<1$.
+Observe que $u$ na equação acima está definida apenas para $u<1$, mas 
+pela simetria da distribuição podemos dividir a equação 
+\eqref{eq:densepac} por 2 para obter a função de distribuição no 
+domínio desejado, que é $|u|<1$.
 
 $$
-f^{\ast}(u)=\frac{\frac{3}{2}(1-u)^{2} + \frac{3}{2}u(1-u)}{2} = \frac{3}{4}\left(1-u^2\right), |u|< 1
+f^{\ast}(u)=\frac{\frac{3}{2}(1-u)^{2} + \frac{3}{2}u(1-u)}{2} = 
+\frac{3}{4}\left(1-u^2\right), |u|< 1
 $$
 
 # Exercício 4
 ***
 
-# Resolução do Algoritmo
+** Seja $X$ uma variável aleatória não-negativa com
+   $\mu = E(X) < \infty$. Para uma amostra aleatória
+   $x_1, x_2, \ldots, _n$ da distribuição X, a razão de gini é:**
 
-* Elaborração do algoritimo para a Razão de gini;
-* Estimar $\mu$ por simulação e obtendo $\bar{X}$ de cada amostra gerada das dist. $logN(0,1), U(0,1) e Bin(1,0.5)$; 
-* Gerar $10^6$ variáveis da distribuicões citadas acima e ordena-las em ordem crescente;
-* Cada distribuição recebeu um índice que identifica qual esta sendo usada na fução: 1= logNormal, 2=Uniforme e 3=Binomial, para que a função escolha a função desejada;
+$$G = \dfrac{1}{2n^2}\sum_{j=1}^{n}\sum_{i =1}^{n}|x_i - x_j|.$$
+
+**Esta quantidade é utilizada em Economia para medir a desigualdade na
+  distribuição de renda. Observe  também que $G$ pode ser reescrito
+  como função das estatísticas de ordem:**
+
+$$G = \dfrac{1}{n^2\mu}\sum_{i=1}^{n}(2i - n -1)x_{(i)}.$$
+
+**Se a média é desconhecida, considere $\hat G$ como a estatística $G$,   na qual subistitui-se $\mu$ por $\bar X$. Estime por simulação a
+  média, a mediana e os decis(quantis 0,10,...,80,90,100) de $\hat G$,
+  quanto $X$ tem:**
+
+a. Distribuição lognormal;
+b. Distribuição Uniforme;
+c. Distribuição Bernoulli(0,1).
+
+**Escolha os parâmetros das distribuições log-normal e uniforme    
+  conforme achar adequado.**
+
+**Solução:**
+
+Nosso interesse é estimar $\mu = E(X)$ através de simulação 
+considerando $3$ distribuições como referência:
+
+a. $X \sim lognormal(0,1)$;
+b. $X \sim Uniforme(0,1)$;
+c. $X \sim Binomial(1,0,1)$.
+
+O algoritmo é o seguinte:
 
 
-```{r estimador}
+1. Gerar $10^6$ valores da distribuição;
+2. Ordena estes valores;
+3. Substitui os valores ordenados na função $G$.
+4. Calcula-se a média;
+5. Repete este processo $n$ vezes;
+6. Calcula-se a média das médias.
+
+Seja a função gini abaixo com parâmetros n e dist, em que dist 
+corresponde a qual função de refêrencia será usada, 1= logNormal, 
+2=Uniforme e 3=Binomial.
+
+```{r, include = TRUE}
 gini=function(n,dist){
   if ((dist< 1) | (dist >3)) stop("Valor interios deve estar entre 1 e 3!")
   {gi=vector("numeric", n);
@@ -342,46 +497,75 @@ gini=function(n,dist){
   return(ki/(n^2*xb))
 }
 ```
-* As estimativas da quantidade de Gini para cada distribuição da variável aleatória são:
 
-```{r gini}
-gin1=replicate(100, gini(1000,1)) #Lognormal
-gin2=replicate(100, gini(1000,2)) #Uniforme
-gin3=replicate(100, gini(1000,3)) #Binomial
+Dado a função acima, podemos agora calcula a estimativa da média, 
+mediana e os decis(quantis 0,10,...,80,90,100) de $\hat G$. 
 
+* Seja $X \sim Lognormal(0,1)$
+
+A estimativa da média de $G$ vai ser dado por
+$E(X) = `r mean(replicate(1000, gini(10000,1)))`$. A estimativa da 
+mediada é igual a `r median(replicate(1000,gini(10000,1)))` e os 
+quantis são dados por:
+
+```{r, include= TRUE}
+decis <- matrix(round(quantile(replicate(1000, gini(1000,1)),seq(0,1,0.1)), 2), ncol = 11 )
+colnames(decis) = c("  0%"  , "10%"   ,"20%",   "30%",   "40%",   "50%",
+                    "60%",   "70%",   "80%", "90%",  "100%" )
+rownames(decis) = c("Estimativas")
+decis
 ```
 
-* A estimativa da média, mediana e os decis da estatística de G gini para a amostra aleatória $x_{1},...,x_{n}$ da variável $X$ ultilizando as distribuiçoes é da seguinte forma:
+* Seja $X \sim Uniforme(0,1)$
 
+A estimativa da média de $G$ vai ser dado por
+$E(X) = `r mean(replicate(1000, gini(10000,2)))`$. A estimativa da 
+mediada é igual a `r median(replicate(1000,gini(10000,2)))` e os 
+quantis são dados por:
 
-```{r estimativas}
-xbar1=mean(gin1) 
-xbar2=mean(gin2) 
-xbar3=mean(gin3) 
-md1=median(gin1)
-md2=median(gin2)
-md3=median(gin3)
-qt1=quantile(gin1,seq(0,1,0.1))
-qt2=quantile(gin2,seq(0,1,0.1))
-qt3=quantile(gin3,seq(0,1,0.1))
+```{r, include= TRUE}
+decis <- matrix(round(quantile(replicate(1000, gini(1000,2)),seq(0,1,0.1)), 2), ncol = 11 )
+colnames(decis) = c("  0%"  , "10%"   ,"20%",   "30%",   "40%",   "50%", 
+                    "60%",   "70%",   "80%", "90%",  "100%" )
+rownames(decis) = c("Estimativas")
+decis
+```
+
+* Seja $X \sim Binomial(1,0.1)$
+
+A estimativa da média de $G$ vai ser dado por
+$E(X) = `r mean(replicate(1000, gini(10000,3)))`$. A estimativa da 
+mediada é igual a `r median(replicate(1000,gini(10000,3)))` e os 
+quantis são dados por:
+
+```{r, include= TRUE}
+decis <- matrix(round(quantile(replicate(1000, gini(10000,3)),seq(0,1,0.1)), 2), ncol = 11 )
+colnames(decis) = c("  0%"  , "10%"   ,"20%",   "30%",   "40%",   "50%",
+                    "60%",   "70%",   "80%", "90%",  "100%" )
+rownames(decis) = c("Estimativas")
+decis
 ```
 
 # Exercício 5
 ***
 
+**Construa um intervalo aproximado de confiança de 95% para a razão de
+  Gini \(\gamma = E(G)\) se \(X\) segue uma distribuição log-normal com
+  parâmetros desconhecidos. Averigue a taxa de cobertura do intervalo
+  utilizando Monte Carlo.**
+
+**Solução:**
+
 ```{r, echo=TRUE}
-
-
-################################ QUESTÃO 5 #####################################
-
-
 n = 1000 # tamanho de cada amostra
 
 j = 1 # contador do número de amostras (escolhi, arbitrariamente, 10000)
 
-r = 1 # registro relacionado a cada uma das amostras, para média amostral 
+r = 1 # registro relacionado a cada uma das amostras,
+      # para média amostral 
 	# xbar[r] = mean(x), constante de Gini ghatC[r] = 1/(n^2*xbar[r]), 
-	# e o somatório de 1 a n somaAmost[i]=(2*i-n-1)*xi[i], da fórmula de Gini 
+	# e o somatório de 1 a n somaAmost[i]=(2*i-n-1)*xi[i],
+  # da fórmula de Gini 
 	# como função das estatísticas de ordem.
 
 xbar=0
@@ -391,7 +575,8 @@ somaTot=0
 
 while(j<=10000){	# cálculo das j (10000) estimativas Gini 
 
-	x=rlnorm(n, meanlog = 0, sdlog = 1) # gera amostra aleatória lognormal
+	x=rlnorm(n, meanlog = 0, sdlog = 1) # gera amostra aleatória
+	                                    # lognormal
 	xbar[r]=mean(x)				# calcula x barra
 	ghatC[r]=(1/(n^2*xbar[r]))		# calcula a constante
 
@@ -421,23 +606,19 @@ zpos=1.96		# z para alfa=0.975
 inf=media+zneg*desvio		# limite inferior do intervalo 
 sup=media+zpos*desvio		# limite superior do intervalo
 
-table(G<inf)	# se TRUE, valor simulado está abaixo do intervalo inferior
+table(G<inf) # se TRUE,
+             # valor simulado está abaixo do intervalo inferior
 a=matrix(table(G<inf))
 
-table(G>sup)	# se TRUE, valor simulado está acima do intervalo superior
+table(G>sup)	# se TRUE,
+              # valor simulado está acima do intervalo superior
 b=matrix(table(G>sup))
 
 #### valor (%) simulado fora do intervalo de 95%
 
 percent=100*((a[2,1]+b[2,1])/10000)	
 percent
-
-
-
-#################################### FIM ######################################
-
 ```
-
 
 # Exercício 6
 ***
@@ -584,23 +765,22 @@ distribuições analisadas.
 
 # Exercício 7
 ***
-Determinar uma estimativa de Monte Carlo para:
+
+**Determinar uma estimativa de Monte Carlo para:**
 
 $$\int_{0}^{\pi/3}\sin (t) dt$$
 
-
-e comparar a estimativa com o valor exato da integral.
-
+**e comparar a estimativa com o valor exato da integral.**
 
 **Solução:**
 
-Primeiramente vamos fazer uma tranformação de variáveis, de modo que o novo intervalo de integração seja (0,1)
+Primeiramente vamos fazer uma tranformação de variáveis, de modo que o 
+novo intervalo de integração seja (0,1)
 
 
 $$ y = \frac{t-0}{\frac{\pi}{3}-0} = \frac{3t}{\pi}  \\ dy= \frac{3}{\pi} dt$$
 
 Dessa forma, temos que
-
 
 $$ \int_{0}^{\pi/3}\sin (t) dt = \frac{\pi}{3}\int_{0}^{1}\sin (\frac{y\pi}{3}) dy $$
 
@@ -611,9 +791,7 @@ O que vamos fazer agora é
 - Obter a estimativa da integral: $\hat{\theta}=\frac{\pi}{3}g(\bar{y})$;
 - Calcular o valor exato da integral.
 
-
-```{r,}
-
+```{r}
 n <- 1e7
 y <- runif(n, 0, 1) #gerando U[0,1]
 gx <- sin(y*(pi/3)) #aplicando na função
@@ -623,14 +801,10 @@ theta
 
 valor_exato  <- (-cos(pi/3)+cos(0)) #Valor exato da integral
 valor_exato
-
 ```
-
-
 
 # Exercício 8
 ***
-
 
 Gostaríamos de estimar 
 
