@@ -1,0 +1,123 @@
+---
+title: "Questão 5"
+author: "Daniel Henrique Barboza e André Possati"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+library(knitr)
+```
+
+Seja $X_j \sim LogNorm(\mu, \sigma^2)$, estamos interessados na estatística $G_i = \frac{1}{n^2 \mu} \sum_{i=1}^n (2i - n - 1)x_{(i)}$.
+
+Como a estatística de interesse é $G$, iremps gerar uma amostra de tamanho $100$ da mesma e então utilizar o Teorema do Limite Central (TLC) para criar o intervalo de confiança.
+$$\frac{\bar{G} - E(G)}{\sqrt{var(\bar{G})}} \sim N(0, 1)$$
+
+Para um nível de confiança de 95%, temos o seguinte intervalo de confiança para $E(G)$:
+
+$$\Rightarrow IC(E(G), 0.95) = \bigg[\bar{G} - 1.96*\sqrt{var(\bar{G})}, \bar{G} + 1.96*\sqrt{var(\bar{G})}\bigg]$$
+
+Vamos gerar $1000$ intervalos de confiança para G. Portanto, devemos seguir o seguinte procedimento:
+
+```{r}
+# Para k = 1, 2, ..., 1000
+## Para i = 1, 2, ..., 100
+### Gerar uma amostra de tamanho n de X
+### Calcular G_i
+## Calcular Gbarra e S(G)
+## Calcular o intervalo de confiança assintótico
+## Verificar se a média real está dentro do intervalo
+```
+
+Ao final, a taxa de cobertura será dada pela média dos intervalos que cobriram o real valor.
+
+O valor real de $E(G)$ é dado por:
+
+$$E(G) = erf(\sigma/2)$$
+
+em que $erf(x) = \int_{-x}^x e^{-x^2} dx = 2\phi(\sqrt{2}x) - 1$, para $\phi(x)$ função de distribuição acumulada da normal padrão.
+
+As seguintes funções são utilizadas como auxiliares para o algoritmo acima:
+
+```{r}
+# Define a função G
+G <- function(x)
+{ x = sort(x)
+  n = length(x)
+  aux = sum((2*(1:n) - n - 1)*x)
+  aux = aux/(mean(x)*n^2)
+  
+  return(aux)
+}
+
+# função que gera uma amostra de tamanho k de G para amostra de tamanho n da variável aleatória
+# o parâmetro fr é a função utilizada para gerar a amostra aleatória
+rG <- function(k, n, fr)
+{ replicate(k, G(fr(n)))
+}
+
+IC <- function(x, alpha)
+{ return(mean(x) + c(-1,1)*qnorm(1-(1-alpha)/2)*sd(x)/sqrt(length(x)))
+}
+```
+
+O código abaixo calcula a cobertura cobertura do intervalo de confiança para diferentes tamanhos amostrais (amostras de X) e variâncias. Foram gerados 1000 intervalos de confiança criados com 100 valores para a estatística $G$ cada.
+
+```{r}
+set.seed(1)
+n = c(10,100,1000) # tamanho da amostra da variável aleatória
+ng = 100 # tamanho da amostra de g
+ns = 1000 # numero de simulações (amostras de g que serão geradas)
+
+# parâmetros da distribuição lognormal
+sd = c(0.01, 0.1, 0.5, 1, 5)
+
+# variável que armazena os resultados
+tabelaIC <- data.frame(matrix(0, length(n)*length(sd), 2))
+colnames(tabelaIC) <- c('Cobertura', 'Tamanho Médio')
+
+row = 1
+for(i in n)
+{ for(j in sd)
+  { muReal = 2*pnorm(sqrt(2)*j/2,0,1)-1 # valor real da média
+    fr <- function(x) rlnorm(x,0,j)
+    coberturaIC <- tamanhoIC <- rep(0, ns)
+
+    for(k in 1:ns) # gera ns amostras de G
+    { g <- rG(ng, i, fr) # gera a amostra
+      
+      icAux <- IC(g, 0.95) # calcula o IC assintótico pra amostra
+      # verifica se cobre o parâmetro
+      tamanhoIC[k] = icAux[2] - icAux[1]
+      cond1 = (muReal >= icAux[1])
+      cond2 = (muReal <= icAux[2])
+      # se está dentro do intervalo, muda o valor de coberturaIC[k] para 1
+      if(cond1*cond2) coberturaIC[k] = 1
+    }
+    tabelaIC[row,1] = mean(coberturaIC)
+    tabelaIC[row,2] = mean(tamanhoIC)
+    rownames(tabelaIC)[row] = paste0('n',i,'sd',j)
+    row = row + 1
+  }
+}
+```
+
+\newpage
+
+As tabelas 1, 2 e 3 apresentam os resultados obtidos para a cobertura do intervalo de confiançã de $E(G)$ para os tamanhos amostrais 10, 100 e 1000, respectivamente.
+
+Percebe-se que a taxa de cobertura do intervalo de confiança aumenta consideravelmente conforme aumentamos o tamanho amostral de $X$.
+Também é perceptível do efeito do desvio padrão de $X$ na cobertura. Possivelmente, o efeito deve-se ao fato de que, quando $sigma$ aumenta, é mais comum a ocorrência de valores extremos de X, além de que a variância da lognormal atinge valores extremamente altos, o que faz o índice de Gini ter pouca variação.
+
+```{r, echo = F}
+tabela10 = tabelaIC[1:5,]
+tabela100 = tabelaIC[6:10,]
+tabela1000 = tabelaIC[11:15,]
+rownames(tabela10) = rownames(tabela100) = rownames(tabela1000) = paste0('Desvio Padrão ', sd)
+kable(tabela10, digits = 3, caption = 'Taxa de cobertura e tamanho medio do IC de 95% para n = 10.')
+kable(tabela100, digits = 3, caption = 'Taxa de cobertura e tamanho medio do IC de 95% para n = 100.')
+kable(tabela1000, digits = 3, caption = 'Taxa de cobertura e tamanho medio do IC de 95% para n = 1000.')
+```
+
