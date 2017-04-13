@@ -1,11 +1,9 @@
 # Lista de exercícios para a P1 (12/04/2017)
 
+***)
+- [VERSÃO COMPILADA (HTML) DA LISTA 1](http://estatcomp.github.io/henrique/lista1.html)
+
 ***
-
-**Antes de subir sua parte, certifique-se de que o file está na codificação utf-8.**
-
-**Abaixo tem um parênteses ao lado dos nomes de cada dupla. Após subir seu arquivo, substitua o _ por um X dentro do parênteses
-  correspondente a sua questão, para assim sabermos mais facilmente quem já subiu e concluiu sua parte.**
 
 Divisão das questões:
 
