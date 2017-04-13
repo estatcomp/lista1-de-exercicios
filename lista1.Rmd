@@ -31,7 +31,7 @@ options(width=100)
 ***
 
 **A distribuição de Pareto ($\alpha,\beta$) tem a seguinte 
-distribuição**
+  distribuição**
 
 \[ F(x) = 1-(\beta /x)^\alpha \]
 
@@ -48,11 +48,11 @@ da inversão.
 
 Segundo o teorema da Probabilidade da Transformação Integral
 (Rizzo,2008), se X é uma variável aleatória continua com distribuição 
-$F_x (x)$, então U = $F_x (x)$ ~ U (0,1).
+\(F_x (x)\), então U = \(F_x (x)$ ~ U (0,1)\).
 
 Assim, 
 
-$$F_x^{-1}(u)= inf [x : F_x (x)=u] , 0<u<1.$$
+\[ F_x^{-1}(u)= inf [x : F_x (x)=u] , 0<u<1.\]
 
 
 Calculando a inversa de F(x), temos que $F_x^{-1}(u)$ é descrita por:
@@ -139,14 +139,16 @@ Geramos um elemento $x$ a partir da densidade $g$ e aceitamos o
 elemento com probabilidade $f(x)/cg(X)$, ou seja,
 
 $$
-P(\text{Aceitar}|Y) = P\left(U < \frac{f(Y)}{cg(Y)}|Y\right) = \frac{f(Y)}{cg(Y)}.
+P(\text{Aceitar}|Y) = P\left(U < \frac{f(Y)}{cg(Y)}|Y\right) = 
+\frac{f(Y)}{cg(Y)}.
 $$
 
 Note ainda que a probabilidade total de aceitar $Y$ pode ser calculada 
 da seguinte maneira:
 
 $$
-\sum_{n}P(\text{Aceitar}|y)P(Y=y)=\sum_{n}\frac{f(y)}{cg(y)}g(y)=\frac{1}{c}.
+\sum_{n}P(\text{Aceitar}|y)P(Y=y)=\sum_{n}\frac{f(y)}{cg(y)}g(y)=
+\frac{1}{c}.
 $$
 
 Agora possuimos todos os elementos para mostrar, pelo menos no caso 
@@ -158,7 +160,8 @@ Suponha um $k$ qualquer de modo que $f(k)>0$, então pelo teorema de
 Bayes temos que: 
 
 $$
-P(k|\text{Aceitar})=\frac{P(\text{Aceitar}|k)g(k)}{P(\text{Aceitar})} = \frac{[f(k)/(cg(k))]g(k)]}{1/c} = f(k)
+P(k|\text{Aceitar})=\frac{P(\text{Aceitar}|k)g(k)}{P(\text{Aceitar})} =
+\frac{[f(k)/(cg(k))]g(k)]}{1/c} = f(k)
 $$
 
 Este método pode ser implementado ao gerar um elemento $u$ distribuido 
@@ -171,7 +174,8 @@ distribuição $f$.
 
 Algoritmo
 
-O algoritmo do método de aceitação-rejeição pode ser apresentado nos passos abaixo.
+O algoritmo do método de aceitação-rejeição pode ser apresentado nos 
+passos abaixo.
 
 1. Simula-se o valor $x$ com densidade $g$ }
 
@@ -245,7 +249,9 @@ $$
 então, para $Y_i = |U_i|$ temos que
 
 $$
-F_{Y_i}(y) = P(|U_i| \leq y) = P(-y \leq U_i \leq y) = F_{U_i}(y) - F_{U_i}(-y) = \left(\frac{y+1}{2}\right) - \left(\frac{-y+1}{2}\right) = y,
+F_{Y_i}(y) = P(|U_i| \leq y) = P(-y \leq U_i \leq y) = F_{U_i}(y) - 
+F_{U_i}(-y) = \left(\frac{y+1}{2}\right) - \left(\frac{-y+1}{2}\right) 
+= y,
 $$
 
 ou seja, $Y_i \sim U(0,1)$, $i\in\{1,2,3\}$.
@@ -306,7 +312,7 @@ Y_3\leq x)],
 
 onde na primeira igualdade listamos as possíveis formas que o evento 
 $[Y_3>max\{Y_1,Y_2\},Y_3\leq x]$ pode ocorrer e na segunda igualdade 
-usamos o fato de $Y_1$ e $Y_2$ serem identicamente distribuídas. Daí
+usamos o fato de $Y_1$ e $Y_2$ serem identicamente distribuídas. Daí 
 
 \begin{align*}
 P(Y_3 \leq max\{Y_1,Y_2\},Y_3\leq x) &= 2\left[ 
@@ -556,69 +562,39 @@ decis
 
 **Solução:**
 
-```{r, echo=TRUE}
-n = 1000 # tamanho de cada amostra
+Seja $X_j \sim LogNorm(\mu, \sigma^2)$, estamos interessados na
+estatística $G_i = \frac{1}{n^2 \mu} \sum_{i=1}^n (2i - n - 1)x_{(i)}$.
 
-j = 1 # contador do número de amostras (escolhi, arbitrariamente, 10000)
+Como a estatística de interesse é $G$, iremps gerar uma amostra de 
+tamanho $100$ da mesma e então utilizar o Teorema do Limite Central 
+(TLC) para criar o intervalo de confiança.
+$$\frac{\bar{G} - E(G)}{\sqrt{var(\bar{G})}} \sim N(0, 1)$$
 
-r = 1 # registro relacionado a cada uma das amostras,
-      # para média amostral 
-	# xbar[r] = mean(x), constante de Gini ghatC[r] = 1/(n^2*xbar[r]), 
-	# e o somatório de 1 a n somaAmost[i]=(2*i-n-1)*xi[i],
-  # da fórmula de Gini 
-	# como função das estatísticas de ordem.
+Para um nível de confiança de 95%, temos o seguinte intervalo de 
+confiança para $E(G)$:
 
-xbar=0
-ghatC=0
-G=0  
-somaTot=0
+$$\Rightarrow IC(E(G), 0.95) = \bigg[\bar{G} - 
+1.96*\sqrt{var(\bar{G})}, \bar{G} + 1.96*\sqrt{var(\bar{G})}\bigg]$$
 
-while(j<=10000){	# cálculo das j (10000) estimativas Gini 
+Vamos gerar $1000$ intervalos de confiança para G. Portanto, devemos 
+seguir o seguinte procedimento:
 
-	x=rlnorm(n, meanlog = 0, sdlog = 1) # gera amostra aleatória
-	                                    # lognormal
-	xbar[r]=mean(x)				# calcula x barra
-	ghatC[r]=(1/(n^2*xbar[r]))		# calcula a constante
-
-		xi=sort(x)				# ordena a amostra gerada
-
-			somaAmost=0				# laço para cálculo do somatório
-			for (i in 1:n)	{			 	
-			somaAmost[i]=(2*i-n-1)*xi[i]		
-						}			
-
-			somaTot[r]=sum(somaAmost)	# registrando cada um dos somatórios
-
-				G[j]=ghatC[r]*somaTot[r]	# cálculo da estimativa G
-					
-					j=j+1
-					r=r+1
-
-		}
-
-#### Construindo o IC ((1-alpha)*100%) para G
-
-media=mean(G)
-desvio=sd(G)	# desvio padrão das estimativas G
-zneg=-1.96		# z para alfa=0.025
-zpos=1.96		# z para alfa=0.975
-
-inf=media+zneg*desvio		# limite inferior do intervalo 
-sup=media+zpos*desvio		# limite superior do intervalo
-
-table(G<inf) # se TRUE,
-             # valor simulado está abaixo do intervalo inferior
-a=matrix(table(G<inf))
-
-table(G>sup)	# se TRUE,
-              # valor simulado está acima do intervalo superior
-b=matrix(table(G>sup))
-
-#### valor (%) simulado fora do intervalo de 95%
-
-percent=100*((a[2,1]+b[2,1])/10000)	
-percent
+```{r}
+# Para k = 1, 2, ..., 1000
+## Para i = 1, 2, ..., 100
+### Gerar uma amostra de tamanho n de X
+### Calcular G_i
+## Calcular Gbarra e S(G)
+## Calcular o intervalo de confiança assintótico
+## Verificar se a média real está dentro do intervalo
 ```
+
+Ao final, a taxa de cobertura será dada pela média dos intervalos que 
+cobriram o real valor.
+
+O valor real de $E(G)$ é dado por:
+
+$$E(G) = erf(\sigma/2)$$
 
 # Exercício 6
 ***
@@ -777,7 +753,6 @@ $$\int_{0}^{\pi/3}\sin (t) dt$$
 Primeiramente vamos fazer uma tranformação de variáveis, de modo que o 
 novo intervalo de integração seja (0,1)
 
-
 $$ y = \frac{t-0}{\frac{\pi}{3}-0} = \frac{3t}{\pi}  \\ dy= \frac{3}{\pi} dt$$
 
 Dessa forma, temos que
@@ -788,7 +763,8 @@ O que vamos fazer agora é
 
 - Gerar $y_{i}$ com distribuição U[0,1];
 - Obter $g(y_{i})= sin(\frac{y_{i}\pi}{3})$;
-- Obter a estimativa da integral: $\hat{\theta}=\frac{\pi}{3}g(\bar{y})$;
+- Obter a estimativa da integral: 
+  $\hat{\theta}=\frac{\pi}{3}g(\bar{y})$;
 - Calcular o valor exato da integral.
 
 ```{r}
@@ -806,22 +782,31 @@ valor_exato
 # Exercício 8
 ***
 
-Gostaríamos de estimar 
+**Apresente 2 estimativas de Monte Carlo para**
 
-\[\Phi(x)=P(X\leq x)=\int_{-\infty}^x \dfrac{1}{\sqrt{2\pi}}\exp(-t^2/2) dt,\]
+\[\Phi(x) = P(X \leq x) = \int_{-\infty}^{x}
+            \frac{1}{\sqrt{2\pi}} \exp(-t^{2}/2) dt,\]
 
-Pela simetría da distribuição normal padrão essa estimação se reduce a estimar para $x>0$
+**também determine estimativas de variância e um IC(95%) para**
+\(P(X \leq 1.5)\).
+
+**Solução:**
+
+Pela simetría da distribuição normal padrão essa estimação se reduz a
+estimar para $x>0$
 
 \[\begin{equation} 
 \theta=\int_0^x \dfrac{1}{\sqrt{2\pi}}\exp(-t^2/2) dt,
 \end{equation}\]
 
-vamos obter duas estimativas de $\theta$,  a primeira usando uma a.a. de uniformes em (0,1) e outra gerando uniformes em $(0,x).$, para um valor de $x>0.$ previamente fixado. Finalmente para obtermos as estimativas para $\Phi(x)$ usamos
+vamos obter duas estimativas de $\theta$,  a primeira usando uma a.a. 
+de uniformes em (0,1) e outra gerando uniformes em $(0,x).$, para um 
+valor de $x>0.$ previamente fixado. Finalmente para obtermos as 
+estimativas para $\Phi(x)$ usamos
 
 $$\widehat{\Phi(x)}=\hat{\theta}+0.5,$$
-a implementação do algoritmo usando estimação por Monte Carlo é apresentado a continuação, para o valor $x=1.5$. 
-
-
+a implementação do algoritmo usando estimação por Monte Carlo é
+apresentado a continuação, para o valor $x=1.5$. 
 
 ```{r}
 #usando uniformes (0,1)
@@ -840,10 +825,7 @@ ic1<-round(media1 + c(-1,1) * qnorm(1-alpha/2,mean=0,sd=1) * sqrt(v1/m), 4)
 print(media1)
 print(v1)
 print(ic1)
-
-
 ```
-
 
 ```{r}
 #Usando uniformes (0,x)
@@ -864,21 +846,23 @@ print(v2)
 print(ic2)
 ```
 
-
-
-
 # Exercício 9
 ***
 
-Use o Método de Variáveis Antitéticas para estimar
+**Use o Método de Variáveis Antitéticas para estimar**
 
 $$\int_{0}^{1} \frac{e^{-x}} {1+x^2} dx$$
 
-e determine o percentual de redução de variância quando compara-se este resultado àquele sem a técnica de redução de variância.
+**e determine o percentual de redução de variância quando compara-se
+este resultado àquele sem a técnica de redução de variância.**
 
 **Solução:**
+
 Queremos estimar 
-$$\theta= E\Big[\frac{e^{-U}} {1+U^2}\Big] = \int_{0}^{1} \frac{e^{-u}} {1+u^2} du$$
+
+$$\theta= E\Big[\frac{e^{-U}} {1+U^2}\Big] = \int_{0}^{1} \frac{e^{-u}}
+{1+u^2} du$$
+
 expressão na qual $U \sim (0,1)$.
 
 Se $m$ replicatas de Monte Carlo são necessárias, então:
@@ -906,9 +890,12 @@ theta.estimado <- function(U){
 
 theta.estimado(U)
 ```
+
 Assim encontramos a estimativa de `r theta.estimado(U)` para $\theta$.
 
-Para comparar o estimador encontado com aquele sem a técnica de redução de variância replicamos 1000 vezes a simulação e calculamos a variância amostral para cada estimador.
+Para comparar o estimador encontado com aquele sem a técnica de
+redução de variância replicamos 1000 vezes a simulação e calculamos a
+variância amostral para cada estimador.
 
 ```{r}
 theta.sem.red <- function(U){
@@ -920,63 +907,85 @@ mc2 = replicate(1000, theta.estimado(runif(1000)))
 
 ```
 
-Seja $\widehat{\theta}_1$ o estimador encontrado sem a técnica de redução de variância e $\widehat{\theta}_2$ o estimador com redução de variância, encontramos que $SD(\widehat{\theta}_1)$=`r round(sd(mc1),5)` e $SD(\widehat{\theta}_2)$=`r round(sd(mc2),5)`.
+Seja $\widehat{\theta}_1$ o estimador encontrado sem a técnica de
+redução de variância e $\widehat{\theta}_2$ o estimador com redução de
+variância, encontramos que $SD(\widehat{\theta}_1)$=
+`r round(sd(mc1),5)` e $SD(\widehat{\theta}_2)$=`r round(sd(mc2),5)`.
 
-Se temos 2 estimadores, $θ_1$ e  $θ_2$, e $V(θ_2)<V(θ_1)$, então o percentual de redução de variância é:
+Se temos 2 estimadores, $θ_1$ e  $θ_2$, e $V(θ_2)<V(θ_1)$, então o
+percentual de redução de variância é:
 
-$$ 100 (\frac{V(\widehat{\theta}_1)-V(\widehat{\theta}_2)} {V(\widehat{\theta}_1)})\%$$
+$$ 100 (\frac{V(\widehat{\theta}_1)-V(\widehat{\theta}_2)}
+{V(\widehat{\theta}_1)})\%$$
 
-Portanto, temos que o percentual de redução de variância será de `r round(100*(var(mc1)-var(mc2))/var(mc1), 2)`% :
+Portanto, temos que o percentual de redução de variância será de
+`r round(100*(var(mc1)-var(mc2))/var(mc1), 2)`% :
 
 ```{r}
 round(100*(var(mc1)-var(mc2))/var(mc1), 2)
 ```
 
-
-
 # Exercício 10
 ***
 
-A questão pede que estimemos a esperança de $X^2$ de uma distribuição normal padrão definida no intervalo $[1,\infty)$ pelo método da amostragem por importância.
-A esperança a ser estimada é descrita a seguir:
+**Estime**
 
-$$
-E(X^2) = \int_{1}^{\infty} \frac{{x^2}}{\sqrt{2\pi}}exp \left( \frac{-x^2}{2} \right) 
-$$
-Uma distribuição interessante para ser utilizada é a distribuição normal padrão truncada em 1, porque possui o mesmo suporte que a densidade que temos $[0,\infty)$ e, além disso, a razão entre ambas gera uma expressão estável. A estabilidade se dá pela semelhança entre a distribuição normal que a questão oferece e a distribuição normal truncada. 
+\[ E(X^{2}) = \int_{1}^{\infty} \frac{x^{2}}{\sqrt{2\pi}}
+               \exp\left( \frac{-x^{2}}{2} \right) dx \]
 
-A razão referida anteriormente pode ser definida, com alguma simplificação de notação, da seguinte maneira: 
+**utilizando amostragem por importância.**
+
+A questão pede que estimemos a esperança de $X^2$ de uma distribuição
+normal padrão definida no intervalo $[1,\infty)$ pelo método da
+amostragem por importância.
+
+Uma distribuição interessante para ser utilizada é a distribuição
+normal padrão truncada em 1, porque possui o mesmo suporte que a
+densidade que temos $[0,\infty)$ e, além disso, a razão entre ambas
+gera uma expressão estável. A estabilidade se dá pela semelhança entre
+a distribuição normal que a questão oferece e a distribuição normal
+truncada. 
+
+A razão referida anteriormente pode ser definida, com alguma
+simplificação de notação, da seguinte maneira: 
 
 $$
 R = \frac{g(x)}{f(x)},
 $$
-onde $g(x)$ denota a distribuição original, no caso a distribuição normal padrão pré multiplicada por $x^2$ e $f(X)$ a função de importância. É importante observar que a variância do estimador depende de $R$, logo é aconselhável obter razões $R$ mais estáveis.
+
+onde $g(x)$ denota a distribuição original, no caso a distribuição
+normal padrão pré multiplicada por $x^2$ e $f(X)$ a função de
+importância. É importante observar que a variância do estimador
+depende de $R$, logo é aconselhável obter razões $R$ mais estáveis.
 
 A implementação do algoritmo de importância segue abaixo:
 
 ```{r}
 MCNormTruncX2 <- function(n,lower=1,upper=Inf,media=0,dp=1){
-# verificando se o pacote truncnorm precisa ser instalado
-if("truncnorm" %in% rownames(installed.packages())==FALSE)
-{install.packages("truncnorm");library(truncnorm)}
+  # verificando se o pacote truncnorm precisa ser instalado
+  if("truncnorm" %in% rownames(installed.packages())==FALSE)
+  {install.packages("truncnorm");library(truncnorm)}
   else library(truncnorm)
   
-rtn      <- rtruncnorm(n=n,a=lower,b=upper,mean=media,sd=dp)
-int1     <- ((rtn^2)*dnorm(x=rtn,mean=media,sd=dp))/dtruncnorm(x=rtn,
-        a=lower,b=upper,mean=media,sd=dp)
-impMC1   <- mean(int1)
-varinf1  <- var(int1)/n
-
-result   <- list(thetahat = impMC1,
-                 varhat   = varinf1)
-return(result)
+  rtn <- rtruncnorm(n=n,a=lower,b=upper,mean=media,sd=dp)
+  int1 <- ((rtn^2)*dnorm(x=rtn,mean=media,sd=dp))/
+    dtruncnorm(x=rtn, a=lower,b=upper,mean=media,sd=dp)
+  impMC1 <- mean(int1)
+  varinf1 <- var(int1)/n
+  
+  result <- list(thetahat = impMC1,
+                 varhat = varinf1)
+  return(result)
 }
-cbind(rbind(MCNormTruncX2(n=100),MCNormTruncX2(n=1e4),MCNormTruncX2(n=1e6)),c(100,1e4,1e6))
+cbind(rbind(MCNormTruncX2(n=100),MCNormTruncX2(n=1e4)
+            ,MCNormTruncX2(n=1e6)),c(100,1e4,1e6))
 ```
 
-Note que os valores de truncagem estão pré definidos, mas nada impede que os valores de $lower$ e $upper$ sejam substituidos. O mesmo ocorre com os valores da média e do desvio-padrão. Note também que os resultados indicam que o estimador é consistente, pois à medida que se eleva $n$, a variância do estimador reduz consideravelmente.
-
-
+Note que os valores de truncagem estão pré definidos, mas nada impede
+que os valores de $lower$ e $upper$ sejam substituidos. O mesmo ocorre
+com os valores da média e do desvio-padrão. Note também que os
+resultados indicam que o estimador é consistente, pois à medida que se
+eleva $n$, a variância do estimador reduz consideravelmente.
 
 ***
 ***
