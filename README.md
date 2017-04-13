@@ -1,7 +1,8 @@
 # Lista de exercícios para a P1 (12/04/2017)
 
-***)
-- [VERSÃO COMPILADA (HTML) DA LISTA 1](http://estatcomp.github.io/henrique/lista1.html)
+***
+
+[Versão compilada (html) da Lista 1](http://estatcomp.github.io/henrique/lista1.html)
 
 ***
 
