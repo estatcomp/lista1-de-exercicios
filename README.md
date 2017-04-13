@@ -2,7 +2,7 @@
 
 ***
 
-[Versão compilada (html) da Lista 1](http://estatcomp.github.io/henrique/lista1.html)
+[**Versão compilada (html) da Lista 1**](http://estatcomp.github.io/henrique/lista1.html)
 
 ***
 
